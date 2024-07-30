@@ -1,13 +1,51 @@
 """
-Contains code for zero-mean GP with kernal a*k(x,x) + s*I for some base kernel k.
+Contains code for zero-mean GP with kernel a*k(x,x) + s*I for some base kernel k.
 """
 import logging
 
 import numpy as np
+from rdkit import Chem, DataStructs
+from rdkit.Chem import AllChem
 from scipy.linalg import cho_solve, cholesky, solve_triangular
 
 LOWER = True
 logger = logging.getLogger(__name__)
+
+
+# counts -- minmax kernel
+def get_fingerprint(smiles: str):
+    mol = Chem.MolFromSmiles(smiles)
+    assert mol is not None
+    return AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=2048)
+
+
+def calculate_tanimoto_coefficients(known_smiles: list[str], query_smiles: list[str] = None):
+    """
+    Calculate Tanimoto coefficient matrices for known and query SMILES strings.
+
+    Args:
+        known_smiles (list[str]): List of known SMILES strings.
+        query_smiles (list[str], optional): List of query SMILES strings. Defaults to None.
+
+    Returns:
+        tuple: (K_known_known, K_query_known, K_query_query_diagonal)
+            K_known_known (np.ndarray): Tanimoto coefficients between known molecules.
+            K_query_known (np.ndarray): Tanimoto coefficients between query and known molecules.
+            K_query_query_diagonal (np.ndarray): Diagonal of Tanimoto coefficients for query molecules.
+    """
+
+    known_fp = [get_fingerprint(s) for s in known_smiles]
+    K_known_known = np.asarray([DataStructs.BulkTanimotoSimilarity(fp, known_fp) for fp in known_fp])  # shape (N, N)
+
+    if query_smiles is None:
+        query_smiles = known_smiles
+
+    query_fp = [get_fingerprint(s) for s in query_smiles]
+    K_query_known = np.asarray([DataStructs.BulkTanimotoSimilarity(fp, known_fp) for fp in query_fp])  # shape (M, N)
+
+    K_query_query_diagonal = np.asarray([DataStructs.TanimotoSimilarity(fp, fp) for fp in query_fp])  # shape (M,)
+
+    return K_known_known, K_query_known, K_query_query_diagonal
 
 
 def mll_train(a, s, k_train_train, y_train):
@@ -25,7 +63,6 @@ def noiseless_predict(a, s, k_train_train, k_test_train, k_test_test, y_train, f
 
     Full covar means we return the full covariance matrix, otherwise we return the diagonal.
     """
-
     L = _k_cholesky(k_train_train, s / a)
     mean = np.dot(k_test_train, cho_solve((L, LOWER), y_train))
     covar_adj_sqrt = solve_triangular(L, k_test_train.T, lower=LOWER)
