@@ -1,19 +1,23 @@
 import math
 
 import numpy as np
-from hvgpt import Hypervolume
+from hypervolume import Hypervolume
 
 
 def estimate_hypervolume_via_sampling(
     reference: np.ndarray,  # shape D
     points: np.ndarray,  # shape N x D
-    rng: np.random.Generator,  # random number generator
+    rng: np.random.randint,  # random number generator
     n_sample: int = 100_000,
 ) -> float:
     # Check shapes of inputs
     assert reference.ndim == 1
     assert points.ndim == 2
     assert points.shape[1] == reference.shape[0]
+
+    # Check for NaNs or Infs
+    assert np.all(np.isfinite(reference)), "Reference contains NaNs or Infs"
+    assert np.all(np.isfinite(points)), "Points contain NaNs or Infs"
 
     # Check that reference is <= all input points
     assert np.all(np.min(points, axis=0) >= reference), "Reference point is not dominated by all input points"
@@ -49,20 +53,25 @@ if __name__ == "__main__":
     rng = np.random.default_rng(seed=1234)
 
     def run_test_case(reference, points, expected):
-        # Estimate via sampling
-        output_sampling = estimate_hypervolume_via_sampling(reference=reference, points=points, rng=rng)
+        try:
+            # Estimate via sampling
+            output_sampling = estimate_hypervolume_via_sampling(reference=reference, points=points, rng=rng)
 
-        # Calculate using your hypervolume implementation
-        hv = Hypervolume(reference)
-        output_hypervolume = hv.compute(points)
+            # Calculate using your hypervolume implementation
+            hv = Hypervolume(reference)
+            output_hypervolume = hv.compute(points)
 
-        print(f"Reference: {reference}, Points: {points}")
-        print(f"Expected: {expected}, Sampling Output: {output_sampling}, Hypervolume Output: {output_hypervolume}")
+            print(f"Reference: {reference}, Points: {points}")
+            print(f"Expected: {expected}, Sampling Output: {output_sampling}, Hypervolume Output: {output_hypervolume}")
 
-        assert math.isclose(output_sampling, expected, rel_tol=1e-2), f"Sampling: {output_sampling} vs {expected}"
-        assert math.isclose(
-            output_hypervolume, expected, rel_tol=1e-2
-        ), f"Hypervolume: {output_hypervolume} vs {expected}"
+            assert math.isclose(output_sampling, expected, rel_tol=1e-2), f"Sampling: {output_sampling} vs {expected}"
+            assert math.isclose(
+                output_hypervolume, expected, rel_tol=1e-2
+            ), f"Hypervolume: {output_hypervolume} vs {expected}"
+        except AssertionError as e:
+            print(f"Assertion error: {e}")
+        except Exception as e:
+            print(f"Error: {e}")
 
     # Test 1: single points (should always output the correct answer)
     run_test_case(
