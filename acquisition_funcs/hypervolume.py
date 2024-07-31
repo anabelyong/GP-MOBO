@@ -33,6 +33,7 @@ class MultiList:
         for node in nodes:
             self.append(node, index)
 
+    # TO-DO: look into these differences with hvgpt.py
     def remove(self, node, index, bounds):
         for i in range(index):
             predecessor = node.prev[i]
@@ -57,7 +58,7 @@ class Hypervolume:
         self.list = None
 
     def compute(self, front):
-        is_efficient = pareto_front(np.array(front), maximize=False)
+        is_efficient = pareto_front(np.array(front), maximize=True)
         relevant_points = [front[i] for i in range(len(front)) if is_efficient[i]]
 
         print(f"Relevant points before shifting: {relevant_points}")
@@ -81,7 +82,7 @@ class Hypervolume:
         if length == 0:
             return hvol
         elif dim_index == 0:
-            return sentinel.next[0].cargo[0]
+            return -sentinel.next[0].cargo[0]
         elif dim_index == 1:
             q = sentinel.next[1]
             h = q.cargo[0]
@@ -150,7 +151,7 @@ class Hypervolume:
         node_list = MultiList(dimensions)
         nodes = [Node(dimensions, point) for point in front]
         for i in range(dimensions):
-            self.sort_by_dimension(nodes, i)
+            nodes = self.sort_by_dimension(nodes, i)
             node_list.extend(nodes, i)
         self.list = node_list
 
@@ -158,12 +159,13 @@ class Hypervolume:
         decorated = [(node.cargo[i], index, node) for index, node in enumerate(nodes)]
         decorated.sort()
         nodes[:] = [node for (_, _, node) in decorated]
+        return nodes
 
 
 if __name__ == "__main__":
-    reference_point = [2, 2, 2]
+    reference_point = [0.0, 0.0]
     hv = Hypervolume(reference_point)
-    front = [[1, 0, 1], [0, 1, 0]]
+    front = [[1, 2], [2, 1]]
     volume = hv.compute(front)
     print("Computed Hypervolume:", volume)
 
