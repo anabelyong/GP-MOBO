@@ -218,7 +218,9 @@ if __name__ == "__main__":
         gp_noises=gp_noises,
         n_iterations=20,
     )
-
+    """
+    TODO: clean up code to avoid having irrelevant stats and profiler results
+    """
     profiler.disable()
     stats = pstats.Stats(profiler).sort_stats("cumtime")
     stats.print_stats()
