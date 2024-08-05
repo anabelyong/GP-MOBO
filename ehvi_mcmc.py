@@ -68,6 +68,10 @@ def sample_from_gp_posterior(query_smiles, known_smiles, known_Y, gp_means, gp_a
     return samples
 
 def momcmc_sampling(known_smiles, known_Y, gp_means, gp_amplitudes, gp_noises, num_samples, temperature, desired_acceptance, reference_point, N=100):
+    """
+    1) Based on Pseudocode from MOMCMC: An efficient Monte Carlo method for multi-objective sampling over real parameter space
+    https://www.sciencedirect.com/science/article/pii/S089812211200569X
+    """
     P = known_Y.copy()
     N_points = P.shape[0]
     acceptance_rate = 0.0
