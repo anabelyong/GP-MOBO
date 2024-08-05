@@ -1,15 +1,12 @@
 import cProfile
 import pstats
-
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 from dockstring.dataset import load_dataset
-
 from acquisition_funcs.hypervolume import Hypervolume, infer_reference_point
 from acquisition_funcs.pareto import pareto_front
 from kern_gp.gp_model import independent_tanimoto_gp_predict
 from utils import evaluate_objectives
-
 
 def expected_hypervolume_improvement(pred_means, pred_vars, reference_point, pareto_front, N=100):
     num_points, num_objectives = pred_means.shape
@@ -21,8 +18,9 @@ def expected_hypervolume_improvement(pred_means, pred_vars, reference_point, par
     for i in range(num_points):
         mean = pred_means[i]
         var = pred_vars[i]
-        std = np.sqrt(var)
-        samples = np.random.normal(mean, std, size=(N, num_objectives))
+        cov = np.diag(var)
+
+        samples = np.random.multivariate_normal(mean, cov, size=N)
 
         hvi = 0.0
         for sample in samples:
@@ -33,7 +31,6 @@ def expected_hypervolume_improvement(pred_means, pred_vars, reference_point, par
         ehvi_values[i] = hvi / N
 
     return ehvi_values
-
 
 def ehvi_acquisition(query_smiles, known_smiles, known_Y, gp_means, gp_amplitudes, gp_noises, reference_point):
     pred_means, pred_vars = independent_tanimoto_gp_predict(
@@ -52,20 +49,39 @@ def ehvi_acquisition(query_smiles, known_smiles, known_Y, gp_means, gp_amplitude
 
     return ehvi_values
 
+def sample_from_gp_posterior(query_smiles, known_smiles, known_Y, gp_means, gp_amplitudes, gp_noises, N=100):
+    pred_means, pred_vars = independent_tanimoto_gp_predict(
+        query_smiles=query_smiles,
+        known_smiles=known_smiles,
+        known_Y=known_Y,
+        gp_means=gp_means,
+        gp_amplitudes=gp_amplitudes,
+        gp_noises=gp_noises,
+    )
 
-def momcmc_sampling(known_Y, num_samples, temperature, desired_acceptance, reference_point):
+    samples = np.zeros((N, len(query_smiles), pred_means.shape[-1]))
+    for i in range(len(query_smiles)):
+        mean = pred_means[i]
+        var = pred_vars[i]
+        cov = np.diag(var)
+        samples[:, i, :] = np.random.multivariate_normal(mean, cov, size=N)
+    return samples
+
+def momcmc_sampling(known_smiles, known_Y, gp_means, gp_amplitudes, gp_noises, num_samples, temperature, desired_acceptance, reference_point, N=100):
     P = known_Y.copy()
-    N = P.shape[0]
+    N_points = P.shape[0]
     acceptance_rate = 0.0
 
     hv = Hypervolume(reference_point)
 
     while acceptance_rate < desired_acceptance:
         P_new = np.empty_like(P)
-        for i in range(N):
-            idxs = np.random.choice(N, 3, replace=False)
-            cr1, cr2, cr3 = P[idxs]
-            v = cr1 + 0.8 * (cr2 - cr3)
+        samples = sample_from_gp_posterior(known_smiles, known_smiles, known_Y, gp_means, gp_amplitudes, gp_noises, N)
+
+        for i in range(N_points):
+            # Select a random sample
+            sample_idx = np.random.randint(N)
+            v = samples[sample_idx, i, :]
 
             if pareto_front(np.vstack([P, v]))[-1]:
                 fit_new = hv.compute(np.vstack([P, v]))
@@ -83,7 +99,6 @@ def momcmc_sampling(known_Y, num_samples, temperature, desired_acceptance, refer
         else:
             temperature *= 0.9
     return P
-
 
 def bayesian_optimization_loop(
     known_smiles,
@@ -147,15 +162,19 @@ def bayesian_optimization_loop(
         print(f"Hypervolume: {current_hypervolume}")
 
         known_Y = momcmc_sampling(
-            known_Y,
+            known_smiles=known_smiles,
+            known_Y=known_Y,
+            gp_means=gp_means,
+            gp_amplitudes=gp_amplitudes,
+            gp_noises=gp_noises,
             num_samples=known_Y.shape[0],
             temperature=temperature,
             desired_acceptance=desired_acceptance,
             reference_point=reference_point,
+            N=100
         )
 
     return known_smiles, known_Y, hypervolumes_bo
-
 
 def plot_3d_pareto_and_samples(known_Y, pareto_Y):
     fig = plt.figure()
@@ -169,7 +188,6 @@ def plot_3d_pareto_and_samples(known_Y, pareto_Y):
     ax.set_zlabel("f3")
     ax.legend()
     plt.show()
-
 
 if __name__ == "__main__":
     profiler = cProfile.Profile()
