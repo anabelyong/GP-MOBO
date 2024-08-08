@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: TDC Team
 # License: MIT
-from packaging import version
-import pkg_resources
+
 """This file contains all metadata of datasets in TDC.
 
 Attributes:
@@ -93,26 +92,48 @@ toxicity_dataset_names = [
 ]
 
 adme_dataset_names = [
-    "lipophilicity_astrazeneca", "solubility_aqsoldb",
-    "hydrationfreeenergy_freesolv", "caco2_wang", "pampa_ncats",
-    "approved_pampa_ncats", "hia_hou", "pgp_broccatelli", "bioavailability_ma",
-    "vdss_lombardo", "cyp2c19_veith", "cyp2d6_veith", "cyp3a4_veith",
-    "cyp1a2_veith", "cyp2c9_veith", "cyp2c9_substrate_carbonmangels",
-    "cyp2d6_substrate_carbonmangels", "cyp3a4_substrate_carbonmangels",
-    "bbb_martins", "b3db_classification", "b3db_regression", "ppbr_az",
-    "half_life_obach", "clearance_hepatocyte_az", "clearance_microsome_az",
-    "hlm", "rlm"
+    "lipophilicity_astrazeneca",
+    "solubility_aqsoldb",
+    "hydrationfreeenergy_freesolv",
+    "caco2_wang",
+    "pampa_ncats",
+    "approved_pampa_ncats",
+    "hia_hou",
+    "pgp_broccatelli",
+    "bioavailability_ma",
+    "vdss_lombardo",
+    "cyp2c19_veith",
+    "cyp2d6_veith",
+    "cyp3a4_veith",
+    "cyp1a2_veith",
+    "cyp2c9_veith",
+    "cyp2c9_substrate_carbonmangels",
+    "cyp2d6_substrate_carbonmangels",
+    "cyp3a4_substrate_carbonmangels",
+    "bbb_martins",
+    "b3db_classification",
+    "b3db_regression",
+    "ppbr_az",
+    "half_life_obach",
+    "clearance_hepatocyte_az",
+    "clearance_microsome_az",
+    "hlm",
+    "rlm",
 ]
 
 hts_dataset_names = [
-    "hiv", "sarscov2_3clpro_diamond", "sarscov2_vitro_touret",
-    "orexin1_receptor_butkiewicz", "m1_muscarinic_receptor_agonists_butkiewicz",
+    "hiv",
+    "sarscov2_3clpro_diamond",
+    "sarscov2_vitro_touret",
+    "orexin1_receptor_butkiewicz",
+    "m1_muscarinic_receptor_agonists_butkiewicz",
     "m1_muscarinic_receptor_antagonists_butkiewicz",
     "potassium_ion_channel_kir2.1_butkiewicz",
     "kcnq2_potassium_channel_butkiewicz",
-    "cav3_t-type_calcium_channels_butkiewicz", "choline_transporter_butkiewicz",
+    "cav3_t-type_calcium_channels_butkiewicz",
+    "choline_transporter_butkiewicz",
     "serine_threonine_kinase_33_butkiewicz",
-    "tyrosyl-dna_phosphodiesterase_butkiewicz"
+    "tyrosyl-dna_phosphodiesterase_butkiewicz",
 ]
 
 qm_dataset_names = ["qm7", "qm7b", "qm8", "qm9"]
@@ -161,9 +182,9 @@ catalyst_dataset_names = ["uspto_catalyst"]
 
 tcr_epi_dataset_names = ["weber"]
 
-trial_outcome_dataset_names = ['phase1', 'phase2', 'phase3']
+trial_outcome_dataset_names = ["phase1", "phase2", "phase3"]
 
-proteinpeptide_dataset_names = ['brown_mdm2_ace2_12ca5']
+proteinpeptide_dataset_names = ["brown_mdm2_ace2_12ca5"]
 
 cellxgene_dataset_names = [
     "scperturb_drug_AissaBenevolenskaya2021",
@@ -273,7 +294,7 @@ resources = {
                     2: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_train-2",
                     3: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_train-3",
                     4: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_train-4",
-                }
+                },
             },
             "test": {
                 "tchard_pep_cdr3b_only_neg_assays": {
@@ -303,14 +324,16 @@ resources = {
                     2: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_test-2",
                     3: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_test-3",
                     4: "tchard_pep_cdr3b_cdr3a_mhc_only_sampled_negs_test-4",
-                }
+                },
             },
-            "dev": {}  # no dev set on tchard
+            "dev": {},  # no dev set on tchard
         },
-        "all": ["tchard_full",],
+        "all": [
+            "tchard_full",
+        ],
         "config": {
             "Y": "label",
-        }
+        },
     },
 }
 
@@ -404,10 +427,10 @@ guacamol_oracle = [
     "isomers_c9h10n2o2pf2cl",
     "isomers_c11h24",
     "osimertinib_mpo",
-    "fexofenadine_mpo", #change here for separating fexofenandine MPO
-    "tpsa_score_single", #fexofenadine objective 1 
-    "logp_score_single", #fexofenadine objective 2
-    "fex_similarity_value_single", #fexofenadine objective 3
+    "fexofenadine_mpo",  # change here for separating fexofenandine MPO
+    "tpsa_score_single",  # fexofenadine objective 1
+    "logp_score_single",  # fexofenadine objective 2
+    "fex_similarity_value_single",  # fexofenadine objective 3
     "ranolazine_mpo",
     "perindopril_mpo",
     "amlodipine_mpo",
@@ -476,10 +499,7 @@ docking_benchmark = {
 }
 
 docking_target_info = {
-    "3pbl": {
-        "center": (9, 22.5, 26),
-        "size": (15, 15, 15)
-    },
+    "3pbl": {"center": (9, 22.5, 26), "size": (15, 15, 15)},
     "1iep": {
         "center": (15.61389189189189, 53.38013513513513, 15.454837837837842),
         "size": (15, 15, 15),
@@ -492,10 +512,7 @@ docking_target_info = {
         "center": (-9.063639999999998, -7.1446, 55.86259999999999),
         "size": (15, 15, 15),
     },
-    "3ny8": {
-        "center": (2.2488, 4.68495, 51.39820000000001),
-        "size": (15, 15, 15)
-    },
+    "3ny8": {"center": (2.2488, 4.68495, 51.39820000000001), "size": (15, 15, 15)},
     "4rlu": {
         "center": (-0.7359999999999999, 22.75547368421052, -31.2368947368421),
         "size": (15, 15, 15),
@@ -600,16 +617,13 @@ dti_dg_splits = {"bindingdb_patent": "group"}
 ####################################
 
 # evaluator for single molecule, the input of __call__ is a single smiles OR list of smiles
-download_oracle_names = [
-    "drd2", "gsk3b", "jnk3", "fpscores", "cyp3a4_veith", "smina"
-]
+download_oracle_names = ["drd2", "gsk3b", "jnk3", "fpscores", "cyp3a4_veith", "smina"]
 # download_oracle_names = ['drd2', 'gsk3b', 'jnk3', 'fpscores', 'cyp3a4_veith']
-download_oracle_names = ["drd2", "gsk3b", "jnk3", "fpscores", "cyp3a4_veith"
-                        ] + [
-                            "drd2_current",
-                            "gsk3b_current",
-                            "jnk3_current",
-                        ]
+download_oracle_names = ["drd2", "gsk3b", "jnk3", "fpscores", "cyp3a4_veith"] + [
+    "drd2_current",
+    "gsk3b_current",
+    "jnk3_current",
+]
 
 trivial_oracle_names = ["qed", "logp", "sa"] + guacamol_oracle
 synthetic_oracle_name = ["askcos", "ibm_rxn"]
@@ -656,16 +670,21 @@ meta_oracle_name = [
     "pyscreener",
 ]
 
-oracle_names = (download_oracle_names + trivial_oracle_names +
-                distribution_oracles + synthetic_oracle_name +
-                meta_oracle_name + docking_oracles +
-                download_receptor_oracle_name)
+oracle_names = (
+    download_oracle_names
+    + trivial_oracle_names
+    + distribution_oracles
+    + synthetic_oracle_name
+    + meta_oracle_name
+    + docking_oracles
+    + download_receptor_oracle_name
+)
 
 molgenpaired_dataset_names = ["qed", "drd2", "logp"]
 
-generation_datasets = (retrosyn_dataset_names + forwardsyn_dataset_names +
-                       molgenpaired_dataset_names +
-                       multiple_molecule_dataset_names)
+generation_datasets = (
+    retrosyn_dataset_names + forwardsyn_dataset_names + molgenpaired_dataset_names + multiple_molecule_dataset_names
+)
 # generation
 ####################################
 
@@ -682,9 +701,19 @@ category_names = {
         "CRISPROutcome",
     ],
     "multi_pred": [
-        "DTI", "PPI", "DDI", "PeptideMHC", "DrugRes", "AntibodyAff", "DrugSyn",
-        "MTI", "GDA", "Catalyst", "TCR_Epitope_Binding", "TrialOutcome",
-        "CellXGene"
+        "DTI",
+        "PPI",
+        "DDI",
+        "PeptideMHC",
+        "DrugRes",
+        "AntibodyAff",
+        "DrugSyn",
+        "MTI",
+        "GDA",
+        "Catalyst",
+        "TCR_Epitope_Binding",
+        "TrialOutcome",
+        "CellXGene",
     ],
     "generation": ["RetroSyn", "Reaction", "MolGen"],
 }
@@ -1126,7 +1155,6 @@ oracle2id = {
     "fpscores": 4170416,
     "cyp3a4_veith": 4411249,
     "smina": 6361665,
-    "cyp3a4_veith": 4411249,
     "drd2_current": 6413411,
     "jnk3_current": 6413420,
     "gsk3b_current": 6413412,

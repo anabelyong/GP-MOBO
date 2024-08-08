@@ -1,25 +1,23 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
-from packaging import version
+
+import numpy as np
 import pkg_resources
+from packaging import version
 
 warnings.filterwarnings("ignore")
 
-from tdc_oracles_modified.utils.misc import fuzzy_search
-from tdc_oracles_modified.utils.load import oracle_load, receptor_load
 from tdc_oracles_modified.metadata import (
-    download_oracle_names,
-    oracle_names,
     distribution_oracles,
     docking_oracles,
-    download_receptor_oracle_name,
     docking_target_info,
+    download_oracle_names,
+    download_receptor_oracle_name,
+    oracle_names,
 )
+from tdc_oracles_modified.utils.load import oracle_load, receptor_load
+from tdc_oracles_modified.utils.misc import fuzzy_search
 
-SKLEARN_VERSION = version.parse(
-    pkg_resources.get_distribution("scikit-learn").version)
+SKLEARN_VERSION = version.parse(pkg_resources.get_distribution("scikit-learn").version)
 
 
 def _normalize_docking_score(raw_score):
@@ -84,7 +82,7 @@ class Oracle:
             from .chem_utils import qed
 
             self.evaluator_func = qed
-        #Fexofenadine MPO separated into 3 different oracle functions, TPSA, LOGP, FEX_SIMILARITY
+        # Fexofenadine MPO separated into 3 different oracle functions, TPSA, LOGP, FEX_SIMILARITY
         elif self.name == "tpsa_score_single":
             from .chem_utils import tpsa_score_single
 
@@ -125,30 +123,26 @@ class Oracle:
         elif self.name == "similarity_meta":
             from .chem_utils import similarity_meta
 
-            self.evaluator_func = similarity_meta(
-                target_smiles=self.target_smiles, **self.kwargs)
+            self.evaluator_func = similarity_meta(target_smiles=self.target_smiles, **self.kwargs)
         elif self.name == "rediscovery_meta":
             from .chem_utils import rediscovery_meta
 
-            self.evaluator_func = rediscovery_meta(
-                target_smiles=self.target_smiles, **self.kwargs)
+            self.evaluator_func = rediscovery_meta(target_smiles=self.target_smiles, **self.kwargs)
         elif self.name == "isomer_meta":
             from .chem_utils import isomer_meta
 
-            self.evaluator_func = isomer_meta(target_smiles=self.target_smiles,
-                                              **self.kwargs)
+            self.evaluator_func = isomer_meta(target_smiles=self.target_smiles, **self.kwargs)
         elif self.name == "median_meta":
             from .chem_utils import median_meta
 
             self.evaluator_func = median_meta(
-                target_smiles_1=self.target_smiles[0],
-                target_smiles_2=self.target_smiles[1],
-                **self.kwargs)
+                target_smiles_1=self.target_smiles[0], target_smiles_2=self.target_smiles[1], **self.kwargs
+            )
         elif self.name == "rediscovery":
             from .chem_utils import (
                 celecoxib_rediscovery,
-                troglitazone_rediscovery,
                 thiothixene_rediscovery,
+                troglitazone_rediscovery,
             )
 
             self.evaluator_func = {
@@ -170,8 +164,8 @@ class Oracle:
             self.evaluator_func = thiothixene_rediscovery
         elif self.name == "similarity":
             from .chem_utils import (
-                aripiprazole_similarity,
                 albuterol_similarity,
+                aripiprazole_similarity,
                 mestranol_similarity,
             )
 
@@ -206,11 +200,11 @@ class Oracle:
             self.evaluator_func = median2
         elif self.name == "mpo":
             from .chem_utils import (
-                osimertinib_mpo,
-                fexofenadine_mpo,
-                ranolazine_mpo,
-                perindopril_mpo,
                 amlodipine_mpo,
+                fexofenadine_mpo,
+                osimertinib_mpo,
+                perindopril_mpo,
+                ranolazine_mpo,
                 sitagliptin_mpo,
                 zaleplon_mpo,
             )
@@ -267,10 +261,7 @@ class Oracle:
         elif self.name == "hop":
             from .chem_utils import deco_hop, scaffold_hop
 
-            self.evaluator_func = {
-                "Deco Hop": deco_hop,
-                "Scaffold Hop": scaffold_hop
-            }
+            self.evaluator_func = {"Deco Hop": deco_hop, "Scaffold Hop": scaffold_hop}
         elif self.name == "deco_hop":
             from .chem_utils import deco_hop
 
@@ -319,7 +310,6 @@ class Oracle:
 
             self.evaluator_func = Vina_smiles(**self.kwargs)
         elif self.name == "drd3_docking_vina" or self.name == "3pbl_docking_vina":
-
             from .chem_utils import Vina_smiles
 
             pdbid = "3pbl"
@@ -331,10 +321,12 @@ class Oracle:
                 box_size=boxsize,
             )
 
-        elif (self.name == "drd3_docking" or self.name == "3pbl_docking" or
-              self.name == "drd3_docking_normalize" or
-              self.name == "3pbl_docking_normalize"):
-
+        elif (
+            self.name == "drd3_docking"
+            or self.name == "3pbl_docking"
+            or self.name == "drd3_docking_normalize"
+            or self.name == "3pbl_docking_normalize"
+        ):
             from .chem_utils import PyScreener_meta
 
             pdbid = "3pbl"
@@ -593,7 +585,7 @@ class Oracle:
             nonvalid_smiles_idx_lst, valid_smiles_lst, valid_smiles_idx_lst = [], [], []
             NN = len(smiles_lst)
             for idx, smiles in enumerate(smiles_lst):
-                if Chem.MolFromSmiles(smiles) == None:
+                if Chem.MolFromSmiles(smiles) is None:
                     nonvalid_smiles_idx_lst.append(idx)
                 else:
                     valid_smiles_idx_lst.append(idx)
@@ -606,9 +598,10 @@ class Oracle:
                     self.num_called -= len(smiles_lst)
                     raise ValueError(
                         "The maximum number of evaluator call is reached! The maximum is: "
-                        + str(self.num_max_call) +
-                        ". The current requested call (plus accumulated calls) is: "
-                        + str(self.num_called + len(smiles_lst)))
+                        + str(self.num_max_call)
+                        + ". The current requested call (plus accumulated calls) is: "
+                        + str(self.num_called + len(smiles_lst))
+                    )
 
             #### evaluator for single molecule,
             #### the input of __call__ is a single smiles OR list of smiles
@@ -625,16 +618,12 @@ class Oracle:
 
                 if not self.name == "docking_score":
                     for smiles in smiles_lst:
-                        results_lst.append(
-                            self.normalize(
-                                self.evaluator_func(smiles, *(args[1:]),
-                                                    **kwargs)))
+                        results_lst.append(self.normalize(self.evaluator_func(smiles, *(args[1:]), **kwargs)))
                 else:
                     results_lst = []
                     for smiles in smiles_lst:
                         try:
-                            results = self.evaluator_func([smiles], *(args[1:]),
-                                                          **kwargs)
+                            results = self.evaluator_func([smiles], *(args[1:]), **kwargs)
                             results = results[0]
                         except:
                             results = self.default_property
@@ -647,7 +636,7 @@ class Oracle:
                 return all_results_lst
 
         else:  ### a string of SMILES
-            if Chem.MolFromSmiles(smiles_lst) == None:
+            if Chem.MolFromSmiles(smiles_lst) is None:
                 return self.default_property
 
             self.num_called += 1
@@ -656,9 +645,10 @@ class Oracle:
                     self.num_called -= 1
                     raise ValueError(
                         "The maximum number of evaluator call is reached! The maximum is: "
-                        + str(self.num_max_call) +
-                        ". The current requested call (plus accumulated calls) is: "
-                        + str(self.num_called + 1))
+                        + str(self.num_max_call)
+                        + ". The current requested call (plus accumulated calls) is: "
+                        + str(self.num_called + 1)
+                    )
 
             ## a single smiles
             if type(self.evaluator_func) == dict:

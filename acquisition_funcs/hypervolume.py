@@ -1,50 +1,16 @@
 import numpy as np
 
+"""
+Adapted from:
+1) https://github.com/pytorch/botorch/blob/main/botorch/utils/multi_objective/hypervolume.py
+2) https://github.com/msu-coinlab/pymoo/blob/main/pymoo/vendor/hv.py
+
+"""
+# Constants
 MIN_Y_RANGE = 1e-7
 
 
-def infer_reference_point(pareto_Y, max_ref_point=None, scale=0.1, scale_max_ref_point=False):
-    if pareto_Y.shape[0] == 0:
-        if max_ref_point is None:
-            raise ValueError("Empty pareto set and no max ref point provided")
-        if np.isnan(max_ref_point).any():
-            raise ValueError("Empty pareto set and max ref point includes NaN.")
-        if scale_max_ref_point:
-            return max_ref_point - scale * np.abs(max_ref_point)
-        return max_ref_point
-
-    if max_ref_point is not None:
-        non_nan_idx = ~np.isnan(max_ref_point)
-        better_than_ref = (pareto_Y[:, non_nan_idx] > max_ref_point[non_nan_idx]).all(axis=-1)
-    else:
-        non_nan_idx = np.ones(pareto_Y.shape[-1], dtype=bool)
-        better_than_ref = np.ones(pareto_Y.shape[:1], dtype=bool)
-
-    if max_ref_point is not None and better_than_ref.any() and non_nan_idx.all():
-        Y_range = pareto_Y[better_than_ref].max(axis=0) - max_ref_point
-        if scale_max_ref_point:
-            return max_ref_point - scale * Y_range
-        return max_ref_point
-    elif pareto_Y.shape[0] == 1:
-        Y_range = np.clip(np.abs(pareto_Y), MIN_Y_RANGE, None).reshape(-1)
-        ref_point = pareto_Y.reshape(-1) - scale * Y_range
-    else:
-        nadir = pareto_Y.min(axis=0)
-        if max_ref_point is not None:
-            nadir[non_nan_idx] = np.minimum(nadir[non_nan_idx], max_ref_point[non_nan_idx])
-        ideal = pareto_Y.max(axis=0)
-        Y_range = np.clip(ideal - nadir, MIN_Y_RANGE, None)
-        ref_point = nadir - scale * Y_range
-
-    if non_nan_idx.any() and not non_nan_idx.all() and better_than_ref.any():
-        if scale_max_ref_point:
-            ref_point[non_nan_idx] = (max_ref_point - scale * Y_range)[non_nan_idx]
-        else:
-            ref_point[non_nan_idx] = max_ref_point[non_nan_idx]
-
-    return ref_point
-
-
+# Hypervolume class to calculate the hypervolume
 class Hypervolume:
     def __init__(self, ref_point):
         self.ref_point = -ref_point
@@ -64,6 +30,13 @@ class Hypervolume:
         return self._hv_recursive(i=self.ref_point.shape[0] - 1, n_pareto=pareto_Y.shape[0], bounds=bounds)
 
     def _hv_recursive(self, i, n_pareto, bounds):
+        """
+        1) Sentinel: The sentinel node in the doubly linked list structure used to manage the Pareto points.
+        2) self: Refers to the instance of the Hypervolume class.
+        3) i: The current dimension being processed.
+        4) n_pareto: The number of Pareto points currently considered.
+        5) bounds: An array that keeps track of the bounds in each dimension.
+        """
         hvol = 0.0
         sentinel = self.list.sentinel
         if n_pareto == 0:
@@ -185,6 +158,55 @@ class MultiList:
         bounds[:] = np.minimum(bounds, node.data)
 
 
+# Function to infer the reference point
+def infer_reference_point(pareto_Y, max_ref_point=None, scale=0.1, scale_max_ref_point=False):
+    """
+    1) Compute a suitable reference point for hypervolume calculations,
+    handling edge cases such as empty Pareto sets and presence of NaN values.
+    2) This is same function as the one in the Botorch implementation but we are not using torch functions like
+    tensor.isnan(), uses arrays insteads of tensors, initializes non_nan_idx and better_than_ref with arrays.
+    3) Change '.all(dim=-1), .clamp_min(MIN_Y_RANGE), .view(-1)' to '.all(axis=-1), np.clip(), .reshape(-1)' <- TODO: verify this
+    does the same thing.
+    4) useful for when we do not have a manually calculated reference point, rather this is found in the dataset.
+    """
+    if pareto_Y.shape[0] == 0:
+        if max_ref_point is None:
+            raise ValueError("Empty pareto set and no max ref point provided")
+        if np.isnan(max_ref_point).any():
+            raise ValueError("Empty pareto set and max ref point includes NaN.")
+        return max_ref_point - scale * np.abs(max_ref_point) if scale_max_ref_point else max_ref_point
+
+    if max_ref_point is not None:
+        non_nan_idx = ~np.isnan(max_ref_point)
+        better_than_ref = (pareto_Y[:, non_nan_idx] > max_ref_point[non_nan_idx]).all(axis=-1)
+    else:
+        non_nan_idx = np.ones(pareto_Y.shape[-1], dtype=bool)
+        better_than_ref = np.ones(pareto_Y.shape[:1], dtype=bool)
+
+    if max_ref_point is not None and better_than_ref.any() and non_nan_idx.all():
+        Y_range = pareto_Y[better_than_ref].max(axis=0) - max_ref_point
+        return max_ref_point - scale * Y_range if scale_max_ref_point else max_ref_point
+
+    if pareto_Y.shape[0] == 1:
+        Y_range = np.clip(np.abs(pareto_Y), MIN_Y_RANGE, None).reshape(-1)
+        ref_point = pareto_Y.reshape(-1) - scale * Y_range
+    else:
+        nadir = pareto_Y.min(axis=0)
+        if max_ref_point is not None:
+            nadir[non_nan_idx] = np.minimum(nadir[non_nan_idx], max_ref_point[non_nan_idx])
+        ideal = pareto_Y.max(axis=0)
+        Y_range = np.clip(ideal - nadir, MIN_Y_RANGE, None)
+        ref_point = nadir - scale * Y_range
+
+    if non_nan_idx.any() and not non_nan_idx.all() and better_than_ref.any():
+        ref_point[non_nan_idx] = (
+            (max_ref_point - scale * Y_range)[non_nan_idx] if scale_max_ref_point else max_ref_point[non_nan_idx]
+        )
+
+    return ref_point
+
+
+# test case values extracted from https://github.com/pytorch/botorch/blob/main/test/utils/multi_objective/test_hypervolume.py
 if __name__ == "__main__":
     ref_point = np.array([0.0, 0.0])
     hv = Hypervolume(ref_point)

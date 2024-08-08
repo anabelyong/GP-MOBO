@@ -1,30 +1,29 @@
 # -*- coding: utf-8 -*-
 # Author: TDC Team
 # License: MIT
-#TODO: needs to be modified to separate functions for objectives we need. 
+# TODO: needs to be modified to separate functions for objectives we need.
+import math
+import os
 import pickle
-import numpy as np
-import os.path as op
+import time
 from abc import abstractmethod
 from functools import partial
 from typing import List
-import time, os, math, re
-from packaging import version
+
+import numpy as np
 import pkg_resources
+from packaging import version
 
 try:
-    import rdkit
-    from rdkit import Chem, DataStructs
-    from rdkit.Chem import AllChem, Descriptors
     import rdkit.Chem.QED as QED
-    from rdkit import rdBase
+    from rdkit import Chem, DataStructs, rdBase
+    from rdkit.Chem import AllChem, Descriptors
 
     rdBase.DisableLog("rdApp.error")
     from rdkit.Chem import rdMolDescriptors
     from rdkit.six import iteritems
 except:
-    raise ImportError(
-        "Please install rdkit by 'conda install -c conda-forge rdkit'! ")
+    raise ImportError("Please install rdkit by 'conda install -c conda-forge rdkit'! ")
 
 try:
     from scipy.stats.mstats import gmean
@@ -37,14 +36,13 @@ except:
     raise ImportError("Please install networkx by 'pip install networkx'! ")
 
 from tdc_oracles_modified.utils.load import oracle_load
-from tdc_oracles_modified.utils.misc import print_sys, install
+from tdc_oracles_modified.utils.misc import install, print_sys
 
 mean2func = {
     "geometric": gmean,
     "arithmetic": np.mean,
 }
-SKLEARN_VERSION = version.parse(
-    pkg_resources.get_distribution("scikit-learn").version)
+SKLEARN_VERSION = version.parse(pkg_resources.get_distribution("scikit-learn").version)
 
 
 def smiles_to_rdkit_mol(smiles):
@@ -260,11 +258,7 @@ class ClippedScoreModifier(ScoreModifier):
     Then the generated values are clipped between low and high scores.
     """
 
-    def __init__(self,
-                 upper_x: float,
-                 lower_x=0.0,
-                 high_score=1.0,
-                 low_score=0.0) -> None:
+    def __init__(self, upper_x: float, lower_x=0.0, high_score=1.0, low_score=0.0) -> None:
         """
         Args:
             upper_x: x-value from which (or until which if smaller than lower_x) the score is maximal
@@ -295,11 +289,7 @@ class SmoothClippedScoreModifier(ScoreModifier):
     center of the logistic function.
     """
 
-    def __init__(self,
-                 upper_x: float,
-                 lower_x=0.0,
-                 high_score=1.0,
-                 low_score=0.0) -> None:
+    def __init__(self, upper_x: float, lower_x=0.0, high_score=1.0, low_score=0.0) -> None:
         """
         Args:
             upper_x: x-value from which (or until which if smaller than lower_x) the score approaches high_score
@@ -320,8 +310,7 @@ class SmoothClippedScoreModifier(ScoreModifier):
         self.L = high_score - low_score
 
     def __call__(self, x):
-        return self.low_score + self.L / (1 + np.exp(-self.k *
-                                                     (x - self.middle_x)))
+        return self.low_score + self.L / (1 + np.exp(-self.k * (x - self.middle_x)))
 
 
 class ThresholdedLinearModifier(ScoreModifier):
@@ -341,13 +330,12 @@ _fscores = None
 
 
 def readFragmentScores(name="fpscores"):
-    import gzip
 
     global _fscores
     # generate the full path filename:
     # if name == "fpscores":
     #     name = op.join(previous_directory(op.dirname(__file__)), name)
-    name = oracle_load("fpscores")
+    oracle_load("fpscores")
     try:
         with open("oracle/fpscores.pkl", "rb") as f:
             _fscores = pickle.load(f)
@@ -376,8 +364,7 @@ def calculateScore(m):
         readFragmentScores()
 
     # fragment score
-    fp = rdMolDescriptors.GetMorganFingerprint(
-        m, 2)  # <- 2 is the *radius* of the circular fingerprint
+    fp = rdMolDescriptors.GetMorganFingerprint(m, 2)  # <- 2 is the *radius* of the circular fingerprint
     fps = fp.GetNonzeroElements()
     score1 = 0.0
     nf = 0
@@ -409,8 +396,7 @@ def calculateScore(m):
     if nMacrocycles > 0:
         macrocyclePenalty = math.log10(2)
 
-    score2 = (0.0 - sizePenalty - stereoPenalty - spiroPenalty - bridgePenalty -
-              macrocyclePenalty)
+    score2 = 0.0 - sizePenalty - stereoPenalty - spiroPenalty - bridgePenalty - macrocyclePenalty
 
     # correction for the fingerprint density
     # not in the original publication, added in version 1.1
@@ -518,8 +504,7 @@ def cyp3a4_veith(smiles):
     try:
         from DeepPurpose import utils
     except:
-        raise ImportError(
-            "Please install DeepPurpose by 'pip install DeepPurpose'")
+        raise ImportError("Please install DeepPurpose by 'pip install DeepPurpose'")
 
     import os
 
@@ -528,17 +513,15 @@ def cyp3a4_veith(smiles):
         global cyp3a4_veith_model
         cyp3a4_veith_model = load_cyp3a4_veith()
 
-    import warnings, os
+    import os
+    import warnings
 
     warnings.filterwarnings("ignore")
 
     X_drug = [smiles]
     drug_encoding = "CNN"
     y = [1]
-    X_pred = utils.data_process(X_drug=X_drug,
-                                y=y,
-                                drug_encoding=drug_encoding,
-                                split_method="no_split")
+    X_pred = utils.data_process(X_drug=X_drug, y=y, drug_encoding=drug_encoding, split_method="no_split")
     # cyp3a4_veith_model = cyp3a4_veith_model.to("cuda:0")
     y_pred = cyp3a4_veith_model.predict(X_pred)
     return y_pred[0]
@@ -565,14 +548,8 @@ def similarity(smiles_a, smiles_b):
     bmol = Chem.MolFromSmiles(smiles_b)
     if amol is None or bmol is None:
         return 0.0
-    fp1 = AllChem.GetMorganFingerprintAsBitVect(amol,
-                                                2,
-                                                nBits=2048,
-                                                useChirality=False)
-    fp2 = AllChem.GetMorganFingerprintAsBitVect(bmol,
-                                                2,
-                                                nBits=2048,
-                                                useChirality=False)
+    fp1 = AllChem.GetMorganFingerprintAsBitVect(amol, 2, nBits=2048, useChirality=False)
+    fp2 = AllChem.GetMorganFingerprintAsBitVect(bmol, 2, nBits=2048, useChirality=False)
     return DataStructs.TanimotoSimilarity(fp1, fp2)
 
 
@@ -699,7 +676,6 @@ class jnk3:
     """
 
     def __init__(self):
-
         jnk3_model_path = "oracle/jnk3.pkl"
         if SKLEARN_VERSION >= version.parse("0.24.0"):
             jnk3_model_path = "oracle/jnk3_current.pkl"
@@ -716,7 +692,6 @@ class jnk3:
 
 
 class AtomCounter:
-
     def __init__(self, element):
         """
         Args:
@@ -766,7 +741,6 @@ def parse_molecular_formula(formula):
 
 
 def smiles2formula(smiles):
-
     from rdkit.Chem.rdMolDescriptors import CalcMolFormula
 
     mol = Chem.MolFromSmiles(smiles)
@@ -797,7 +771,6 @@ def canonicalize(smiles: str, include_stereocenters=True):
 
 
 class Isomer_scoring_prev:
-
     def __init__(self, target_smiles, means="geometric"):
         assert means in ["geometric", "arithmetic"]
         if means == "geometric":
@@ -806,11 +779,10 @@ class Isomer_scoring_prev:
             self.mean_func = np.mean
         atom2cnt_lst = parse_molecular_formula(target_smiles)
         total_atom_num = sum([cnt for atom, cnt in atom2cnt_lst])
-        self.total_atom_modifier = GaussianModifier(mu=total_atom_num,
-                                                    sigma=2.0)
-        self.AtomCounter_Modifier_lst = [((AtomCounter(atom)),
-                                          GaussianModifier(mu=cnt, sigma=1.0))
-                                         for atom, cnt in atom2cnt_lst]
+        self.total_atom_modifier = GaussianModifier(mu=total_atom_num, sigma=2.0)
+        self.AtomCounter_Modifier_lst = [
+            ((AtomCounter(atom)), GaussianModifier(mu=cnt, sigma=1.0)) for atom, cnt in atom2cnt_lst
+        ]
 
     def __call__(self, test_smiles):
         molecule = smiles_to_rdkit_mol(test_smiles)
@@ -827,7 +799,6 @@ class Isomer_scoring_prev:
 
 
 class Isomer_scoring:
-
     def __init__(self, target_smiles, means="geometric"):
         assert means in ["geometric", "arithmetic"]
         if means == "geometric":
@@ -836,11 +807,10 @@ class Isomer_scoring:
             self.mean_func = np.mean
         atom2cnt_lst = parse_molecular_formula(target_smiles)
         total_atom_num = sum([cnt for atom, cnt in atom2cnt_lst])
-        self.total_atom_modifier = GaussianModifier(mu=total_atom_num,
-                                                    sigma=2.0)
-        self.AtomCounter_Modifier_lst = [((AtomCounter(atom)),
-                                          GaussianModifier(mu=cnt, sigma=1.0))
-                                         for atom, cnt in atom2cnt_lst]
+        self.total_atom_modifier = GaussianModifier(mu=total_atom_num, sigma=2.0)
+        self.AtomCounter_Modifier_lst = [
+            ((AtomCounter(atom)), GaussianModifier(mu=cnt, sigma=1.0)) for atom, cnt in atom2cnt_lst
+        ]
 
     def __call__(self, test_smiles):
         #### difference 1
@@ -874,34 +844,27 @@ def isomer_meta(target_smiles, means="geometric"):
     return Isomer_scoring(target_smiles, means=means)
 
 
-isomers_c7h8n2o2_prev = isomer_meta_prev(target_smiles="C7H8N2O2",
-                                         means="geometric")
-isomers_c9h10n2o2pf2cl_prev = isomer_meta_prev(target_smiles="C9H10N2O2PF2Cl",
-                                               means="geometric")
-isomers_c11h24_prev = isomer_meta_prev(target_smiles="C11H24",
-                                       means="geometric")
+isomers_c7h8n2o2_prev = isomer_meta_prev(target_smiles="C7H8N2O2", means="geometric")
+isomers_c9h10n2o2pf2cl_prev = isomer_meta_prev(target_smiles="C9H10N2O2PF2Cl", means="geometric")
+isomers_c11h24_prev = isomer_meta_prev(target_smiles="C11H24", means="geometric")
 
 isomers_c7h8n2o2 = isomer_meta(target_smiles="C7H8N2O2", means="geometric")
-isomers_c9h10n2o2pf2cl = isomer_meta(target_smiles="C9H10N2O2PF2Cl",
-                                     means="geometric")
+isomers_c9h10n2o2pf2cl = isomer_meta(target_smiles="C9H10N2O2PF2Cl", means="geometric")
 isomers_c11h24 = isomer_meta(target_smiles="C11H24", means="geometric")
 
 
 class rediscovery_meta:
-
     def __init__(self, target_smiles, fp="ECFP4"):
         self.similarity_func = fp2fpfunc[fp]
         self.target_fp = self.similarity_func(target_smiles)
 
     def __call__(self, test_smiles):
         test_fp = self.similarity_func(test_smiles)
-        similarity_value = DataStructs.TanimotoSimilarity(
-            self.target_fp, test_fp)
+        similarity_value = DataStructs.TanimotoSimilarity(self.target_fp, test_fp)
         return similarity_value
 
 
 class similarity_meta:
-
     def __init__(self, target_smiles, fp="FCFP4", modifier_func=None):
         self.similarity_func = fp2fpfunc[fp]
         self.target_fp = self.similarity_func(target_smiles)
@@ -909,8 +872,7 @@ class similarity_meta:
 
     def __call__(self, test_smiles):
         test_fp = self.similarity_func(test_smiles)
-        similarity_value = DataStructs.TanimotoSimilarity(
-            self.target_fp, test_fp)
+        similarity_value = DataStructs.TanimotoSimilarity(self.target_fp, test_fp)
         if self.modifier_func is None:
             modifier_score = similarity_value
         else:
@@ -919,14 +881,14 @@ class similarity_meta:
 
 
 celecoxib_rediscovery = rediscovery_meta(
-    target_smiles="CC1=CC=C(C=C1)C1=CC(=NN1C1=CC=C(C=C1)S(N)(=O)=O)C(F)(F)F",
-    fp="ECFP4")
+    target_smiles="CC1=CC=C(C=C1)C1=CC(=NN1C1=CC=C(C=C1)S(N)(=O)=O)C(F)(F)F", fp="ECFP4"
+)
 troglitazone_rediscovery = rediscovery_meta(
-    target_smiles="Cc1c(C)c2OC(C)(COc3ccc(CC4SC(=O)NC4=O)cc3)CCc2c(C)c1O",
-    fp="ECFP4")
+    target_smiles="Cc1c(C)c2OC(C)(COc3ccc(CC4SC(=O)NC4=O)cc3)CCc2c(C)c1O", fp="ECFP4"
+)
 thiothixene_rediscovery = rediscovery_meta(
-    target_smiles="CN(C)S(=O)(=O)c1ccc2Sc3ccccc3C(=CCCN4CCN(C)CC4)c2c1",
-    fp="ECFP4")
+    target_smiles="CN(C)S(=O)(=O)c1ccc2Sc3ccccc3C(=CCCN4CCN(C)CC4)c2c1", fp="ECFP4"
+)
 
 similarity_modifier = ClippedScoreModifier(upper_x=0.75)
 aripiprazole_similarity = similarity_meta(
@@ -949,7 +911,6 @@ mestranol_similarity = similarity_meta(
 
 
 class median_meta:
-
     def __init__(
         self,
         target_smiles_1,
@@ -971,12 +932,9 @@ class median_meta:
 
     def __call__(self, test_smiles):
         test_fp1 = self.similarity_func1(test_smiles)
-        test_fp2 = (test_fp1 if self.similarity_func2 == self.similarity_func1
-                    else self.similarity_func2(test_smiles))
-        similarity_value1 = DataStructs.TanimotoSimilarity(
-            self.target_fp1, test_fp1)
-        similarity_value2 = DataStructs.TanimotoSimilarity(
-            self.target_fp2, test_fp2)
+        test_fp2 = test_fp1 if self.similarity_func2 == self.similarity_func1 else self.similarity_func2(test_smiles)
+        similarity_value1 = DataStructs.TanimotoSimilarity(self.target_fp1, test_fp1)
+        similarity_value2 = DataStructs.TanimotoSimilarity(self.target_fp2, test_fp2)
         if self.modifier_func1 is None:
             modifier_score1 = similarity_value1
         else:
@@ -1016,7 +974,6 @@ median2 = median_meta(
 
 
 class MPO_meta:
-
     def __init__(self, means):
         """
         target_smiles, fp in ['ECFP4', 'AP', ..., ]
@@ -1029,18 +986,16 @@ class MPO_meta:
         self.mean_func = mean2func[means]
 
     def __call__(self, test_smiles):
-        molecule = smiles_to_rdkit_mol(test_smiles)
+        smiles_to_rdkit_mol(test_smiles)
 
         score_lst = []
         return self.mean_func(score_lst)
 
 
 def osimertinib_mpo(test_smiles):
-
     if "osimertinib_fp_fcfc4" not in globals().keys():
         global osimertinib_fp_fcfc4, osimertinib_fp_ecfc6
-        osimertinib_smiles = (
-            "COc1cc(N(C)CCN(C)C)c(NC(=O)C=C)cc1Nc2nccc(n2)c3cn(C)c4ccccc34")
+        osimertinib_smiles = "COc1cc(N(C)CCN(C)C)c(NC(=O)C=C)cc1Nc2nccc(n2)c3cn(C)c4ccccc34"
         osimertinib_fp_fcfc4 = smiles_2_fingerprint_FCFP4(osimertinib_smiles)
         osimertinib_fp_ecfc6 = smiles_2_fingerprint_ECFP6(osimertinib_smiles)
 
@@ -1054,21 +1009,17 @@ def osimertinib_mpo(test_smiles):
     fp_ecfc6 = smiles_2_fingerprint_ECFP6(test_smiles)
     tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
     logp_score = logp_modifier(Descriptors.MolLogP(molecule))
-    similarity_v1 = sim_v1_modifier(
-        DataStructs.TanimotoSimilarity(osimertinib_fp_fcfc4, fp_fcfc4))
-    similarity_v2 = sim_v2_modifier(
-        DataStructs.TanimotoSimilarity(osimertinib_fp_ecfc6, fp_ecfc6))
+    similarity_v1 = sim_v1_modifier(DataStructs.TanimotoSimilarity(osimertinib_fp_fcfc4, fp_fcfc4))
+    similarity_v2 = sim_v2_modifier(DataStructs.TanimotoSimilarity(osimertinib_fp_ecfc6, fp_ecfc6))
 
-    osimertinib_gmean = gmean(
-        [tpsa_score, logp_score, similarity_v1, similarity_v2])
+    osimertinib_gmean = gmean([tpsa_score, logp_score, similarity_v1, similarity_v2])
     return osimertinib_gmean
 
 
 def fexofenadine_mpo(test_smiles):
     if "fexofenadine_fp" not in globals().keys():
         global fexofenadine_fp
-        fexofenadine_smiles = (
-            "CC(C)(C(=O)O)c1ccc(cc1)C(O)CCCN2CCC(CC2)C(O)(c3ccccc3)c4ccccc4")
+        fexofenadine_smiles = "CC(C)(C(=O)O)c1ccc(cc1)C(O)CCCN2CCC(CC2)C(O)(c3ccccc3)c4ccccc4"
         fexofenadine_fp = smiles_2_fingerprint_AP(fexofenadine_smiles)
 
     similar_modifier = ClippedScoreModifier(upper_x=0.8)
@@ -1079,18 +1030,20 @@ def fexofenadine_mpo(test_smiles):
     fp_ap = smiles_2_fingerprint_AP(test_smiles)
     tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
     logp_score = logp_modifier(Descriptors.MolLogP(molecule))
-    similarity_value = similar_modifier(
-        DataStructs.TanimotoSimilarity(fp_ap, fexofenadine_fp))
+    similarity_value = similar_modifier(DataStructs.TanimotoSimilarity(fp_ap, fexofenadine_fp))
     fexofenadine_gmean = gmean([tpsa_score, logp_score, similarity_value])
     return fexofenadine_gmean
+
 
 """
 First MPO objective we are splitting: fexofenadine_mpo:
 Split into 3 different functions instead:
 1) sim(fexofenandine, AP)
-2) TPSA 
-3) log P 
+2) TPSA
+3) log P
 """
+
+
 # Individual objective functions
 def tpsa_score_single(test_smiles):
     tpsa_modifier = MaxGaussianModifier(mu=90, sigma=10)
@@ -1098,24 +1051,25 @@ def tpsa_score_single(test_smiles):
     tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
     return tpsa_score
 
+
 def logp_score_single(test_smiles):
     logp_modifier = MinGaussianModifier(mu=4, sigma=1)
     molecule = smiles_to_rdkit_mol(test_smiles)
     logp_score = logp_modifier(Descriptors.MolLogP(molecule))
     return logp_score
 
+
 def fex_similarity_value_single(test_smiles):
     if "fexofenadine_fp" not in globals().keys():
         global fexofenadine_fp
-        fexofenadine_smiles = (
-            "CC(C)(C(=O)O)c1ccc(cc1)C(O)CCCN2CCC(CC2)C(O)(c3ccccc3)c4ccccc4")
+        fexofenadine_smiles = "CC(C)(C(=O)O)c1ccc(cc1)C(O)CCCN2CCC(CC2)C(O)(c3ccccc3)c4ccccc4"
         fexofenadine_fp = smiles_2_fingerprint_AP(fexofenadine_smiles)
 
     similar_modifier = ClippedScoreModifier(upper_x=0.8)
     fp_ap = smiles_2_fingerprint_AP(test_smiles)
-    similarity_value = similar_modifier(
-        DataStructs.TanimotoSimilarity(fp_ap, fexofenadine_fp))
+    similarity_value = similar_modifier(DataStructs.TanimotoSimilarity(fp_ap, fexofenadine_fp))
     return similarity_value
+
 
 def ranolazine_mpo(test_smiles):
     if "ranolazine_fp" not in globals().keys():
@@ -1133,12 +1087,10 @@ def ranolazine_mpo(test_smiles):
     fp_ap = smiles_2_fingerprint_AP(test_smiles)
     tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
     logp_score = logp_modifier(Descriptors.MolLogP(molecule))
-    similarity_value = similar_modifier(
-        DataStructs.TanimotoSimilarity(fp_ap, ranolazine_fp))
+    similarity_value = similar_modifier(DataStructs.TanimotoSimilarity(fp_ap, ranolazine_fp))
     fluorine_value = fluorine_modifier(fluorine_counter(molecule))
 
-    ranolazine_gmean = gmean(
-        [tpsa_score, logp_score, similarity_value, fluorine_value])
+    ranolazine_gmean = gmean([tpsa_score, logp_score, similarity_value, fluorine_value])
     return ranolazine_gmean
 
 
@@ -1192,8 +1144,7 @@ def zaleplon_mpo_prev(test_smiles):
         global zaleplon_fp, isomer_scoring_C19H17N3O2
         zaleplon_smiles = "O=C(C)N(CC)C1=CC=CC(C2=CC=NC3=C(C=NN23)C#N)=C1"
         zaleplon_fp = smiles_2_fingerprint_ECFP4(zaleplon_smiles)
-        isomer_scoring_C19H17N3O2 = Isomer_scoring_prev(
-            target_smiles="C19H17N3O2")
+        isomer_scoring_C19H17N3O2 = Isomer_scoring_prev(target_smiles="C19H17N3O2")
 
     fp = smiles_2_fingerprint_ECFP4(test_smiles)
     similarity_value = DataStructs.TanimotoSimilarity(fp, zaleplon_fp)
@@ -1222,10 +1173,8 @@ def sitagliptin_mpo_prev(test_smiles):
         sitagliptin_mol = Chem.MolFromSmiles(sitagliptin_smiles)
         sitagliptin_logp = Descriptors.MolLogP(sitagliptin_mol)
         sitagliptin_tpsa = Descriptors.TPSA(sitagliptin_mol)
-        sitagliptin_logp_modifier = GaussianModifier(mu=sitagliptin_logp,
-                                                     sigma=0.2)
-        sitagliptin_tpsa_modifier = GaussianModifier(mu=sitagliptin_tpsa,
-                                                     sigma=5)
+        sitagliptin_logp_modifier = GaussianModifier(mu=sitagliptin_logp, sigma=0.2)
+        sitagliptin_tpsa_modifier = GaussianModifier(mu=sitagliptin_tpsa, sigma=5)
         isomers_scoring_C16H15F6N5O = Isomer_scoring_prev("C16H15F6N5O")
         sitagliptin_similar_modifier = GaussianModifier(mu=0, sigma=0.1)
 
@@ -1236,8 +1185,7 @@ def sitagliptin_mpo_prev(test_smiles):
     tpsa_score = Descriptors.TPSA(molecule)
     tpsa_score = sitagliptin_tpsa_modifier(tpsa_score)
     isomer_score = isomers_scoring_C16H15F6N5O(test_smiles)
-    similarity_value = sitagliptin_similar_modifier(
-        DataStructs.TanimotoSimilarity(fp_ecfp4, sitagliptin_fp_ecfp4))
+    similarity_value = sitagliptin_similar_modifier(DataStructs.TanimotoSimilarity(fp_ecfp4, sitagliptin_fp_ecfp4))
     return gmean([similarity_value, logp_score, tpsa_score, isomer_score])
 
 
@@ -1249,10 +1197,8 @@ def sitagliptin_mpo(test_smiles):
         sitagliptin_mol = Chem.MolFromSmiles(sitagliptin_smiles)
         sitagliptin_logp = Descriptors.MolLogP(sitagliptin_mol)
         sitagliptin_tpsa = Descriptors.TPSA(sitagliptin_mol)
-        sitagliptin_logp_modifier = GaussianModifier(mu=sitagliptin_logp,
-                                                     sigma=0.2)
-        sitagliptin_tpsa_modifier = GaussianModifier(mu=sitagliptin_tpsa,
-                                                     sigma=5)
+        sitagliptin_logp_modifier = GaussianModifier(mu=sitagliptin_logp, sigma=0.2)
+        sitagliptin_tpsa_modifier = GaussianModifier(mu=sitagliptin_tpsa, sigma=5)
         isomers_scoring_C16H15F6N5O = Isomer_scoring("C16H15F6N5O")
         sitagliptin_similar_modifier = GaussianModifier(mu=0, sigma=0.1)
 
@@ -1263,8 +1209,7 @@ def sitagliptin_mpo(test_smiles):
     tpsa_score = Descriptors.TPSA(molecule)
     tpsa_score = sitagliptin_tpsa_modifier(tpsa_score)
     isomer_score = isomers_scoring_C16H15F6N5O(test_smiles)
-    similarity_value = sitagliptin_similar_modifier(
-        DataStructs.TanimotoSimilarity(fp_ecfp4, sitagliptin_fp_ecfp4))
+    similarity_value = sitagliptin_similar_modifier(DataStructs.TanimotoSimilarity(fp_ecfp4, sitagliptin_fp_ecfp4))
     return gmean([similarity_value, logp_score, tpsa_score, isomer_score])
 
 
@@ -1276,7 +1221,6 @@ def get_PHCO_fingerprint(mol):
 
 
 class SMARTS_scoring:
-
     def __init__(self, target_smarts, inverse):
         self.target_mol = Chem.MolFromSmarts(target_smarts)
         self.inverse = inverse
@@ -1302,10 +1246,8 @@ def deco_hop(test_smiles):
         pharmacophor_mol = smiles_to_rdkit_mol(pharmacophor_smiles)
         pharmacophor_fp = get_PHCO_fingerprint(pharmacophor_mol)
 
-        deco1_smarts_scoring = SMARTS_scoring(target_smarts="CS([#6])(=O)=O",
-                                              inverse=True)
-        deco2_smarts_scoring = SMARTS_scoring(
-            target_smarts="[#7]-c1ccc2ncsc2c1", inverse=True)
+        deco1_smarts_scoring = SMARTS_scoring(target_smarts="CS([#6])(=O)=O", inverse=True)
+        deco2_smarts_scoring = SMARTS_scoring(target_smarts="[#7]-c1ccc2ncsc2c1", inverse=True)
         scaffold_smarts_scoring = SMARTS_scoring(
             target_smarts="[#7]-c1n[c;h1]nc2[c;h1]c(-[#8])[c;h0][c;h1]c12",
             inverse=False,
@@ -1315,42 +1257,40 @@ def deco_hop(test_smiles):
     fp = get_PHCO_fingerprint(molecule)
     similarity_modifier = ClippedScoreModifier(upper_x=0.85)
 
-    similarity_value = similarity_modifier(
-        DataStructs.TanimotoSimilarity(fp, pharmacophor_fp))
+    similarity_value = similarity_modifier(DataStructs.TanimotoSimilarity(fp, pharmacophor_fp))
     deco1_score = deco1_smarts_scoring(molecule)
     deco2_score = deco2_smarts_scoring(molecule)
     scaffold_score = scaffold_smarts_scoring(molecule)
 
-    all_scores = np.mean(
-        [similarity_value, deco1_score, deco2_score, scaffold_score])
+    all_scores = np.mean([similarity_value, deco1_score, deco2_score, scaffold_score])
     return all_scores
 
 
 def scaffold_hop(test_smiles):
-    if ("pharmacophor_fp" not in globals().keys() or
-            "scaffold_smarts_scoring" not in globals().keys() or
-            "deco_smarts_scoring" not in globals().keys()):
+    if (
+        "pharmacophor_fp" not in globals().keys()
+        or "scaffold_smarts_scoring" not in globals().keys()
+        or "deco_smarts_scoring" not in globals().keys()
+    ):
         global pharmacophor_fp, deco_smarts_scoring, scaffold_smarts_scoring
         pharmacophor_smiles = "CCCOc1cc2ncnc(Nc3ccc4ncsc4c3)c2cc1S(=O)(=O)C(C)(C)C"
         pharmacophor_mol = smiles_to_rdkit_mol(pharmacophor_smiles)
         pharmacophor_fp = get_PHCO_fingerprint(pharmacophor_mol)
 
         deco_smarts_scoring = SMARTS_scoring(
-            target_smarts=
-            "[#6]-[#6]-[#6]-[#8]-[#6]~[#6]~[#6]~[#6]~[#6]-[#7]-c1ccc2ncsc2c1",
+            target_smarts="[#6]-[#6]-[#6]-[#8]-[#6]~[#6]~[#6]~[#6]~[#6]-[#7]-c1ccc2ncsc2c1",
             inverse=False,
         )
 
         scaffold_smarts_scoring = SMARTS_scoring(
-            target_smarts="[#7]-c1n[c;h1]nc2[c;h1]c(-[#8])[c;h0][c;h1]c12",
-            inverse=True)
+            target_smarts="[#7]-c1n[c;h1]nc2[c;h1]c(-[#8])[c;h0][c;h1]c12", inverse=True
+        )
 
     molecule = smiles_to_rdkit_mol(test_smiles)
     fp = get_PHCO_fingerprint(molecule)
     similarity_modifier = ClippedScoreModifier(upper_x=0.75)
 
-    similarity_value = similarity_modifier(
-        DataStructs.TanimotoSimilarity(fp, pharmacophor_fp))
+    similarity_value = similarity_modifier(DataStructs.TanimotoSimilarity(fp, pharmacophor_fp))
     deco_score = deco_smarts_scoring(molecule)
     scaffold_score = scaffold_smarts_scoring(molecule)
 
@@ -1364,9 +1304,7 @@ def valsartan_smarts(test_smiles):
         valsartan_smarts = "CN(C=O)Cc1ccc(c2ccccc2)cc1"  ### smarts
         valsartan_mol = Chem.MolFromSmarts(valsartan_smarts)
 
-        sitagliptin_smiles = (
-            "NC(CC(=O)N1CCn2c(nnc2C(F)(F)F)C1)Cc1cc(F)c(F)cc1F"  ### other mol
-        )
+        sitagliptin_smiles = "NC(CC(=O)N1CCn2c(nnc2C(F)(F)F)C1)Cc1cc(F)c(F)cc1F"  ### other mol
         sitagliptin_mol = Chem.MolFromSmiles(sitagliptin_smiles)
 
         target_logp = Descriptors.MolLogP(sitagliptin_mol)
@@ -1398,21 +1336,21 @@ def valsartan_smarts(test_smiles):
 Synthesizability from a full retrosynthetic analysis
 Including:
     1. MIT ASKCOS
-    ASKCOS (https://askcos.mit.edu) is an open-source software 
-    framework that integrates efforts to generalize known chemistry 
-    to new substrates by learning to apply retrosynthetic transformations, 
-    to identify suitable reaction conditions, and to evaluate whether 
-    reactions are likely to be successful. The data-driven models are trained 
+    ASKCOS (https://askcos.mit.edu) is an open-source software
+    framework that integrates efforts to generalize known chemistry
+    to new substrates by learning to apply retrosynthetic transformations,
+    to identify suitable reaction conditions, and to evaluate whether
+    reactions are likely to be successful. The data-driven models are trained
     with USPTO and Reaxys databases.
-    
+
     Reference:
     https://doi.org/10.1021/acs.jcim.0c00174
 
     2. IBM_RXN
-    IBM RXN (https://rxn.res.ibm.com) is an AI platform integarting 
-    forward reaction prediction and retrosynthetic analysis. The 
-    backend of the IBM RXN retrosynthetic analysis is Molecular 
-    Transformer model (see reference). The model was mainly trained 
+    IBM RXN (https://rxn.res.ibm.com) is an AI platform integarting
+    forward reaction prediction and retrosynthetic analysis. The
+    backend of the IBM RXN retrosynthetic analysis is Molecular
+    Transformer model (see reference). The model was mainly trained
     with USPTO, Pistachio databases.
     Reference:
     https://doi.org/10.1021/acscentsci.9b00576
@@ -1514,7 +1452,9 @@ def askcos(
             "This output value is not implemented. Please select one from 'num_step', 'plausibility', 'synthesizability', 'price'."
         )
 
-    import json, requests
+    import json
+
+    import requests
 
     params = {"smiles": smiles}
     resp = requests.get(host_ip + "/api/price/", params=params, verify=False)
@@ -1545,9 +1485,7 @@ def askcos(
         # For each entry, repeat to test up to num_trials times if got error message
         for _ in range(num_trials):
             print("Trying to send the request, for the %i times now" % (_ + 1))
-            resp = requests.get(host_ip + "/api/treebuilder/",
-                                params=params,
-                                verify=False)
+            resp = requests.get(host_ip + "/api/treebuilder/", params=params, verify=False)
             if "error" not in resp.json().keys():
                 break
 
@@ -1555,8 +1493,7 @@ def askcos(
         with open(file_name, "w") as f_data:
             json.dump(resp.json(), f_data)
 
-    num_path, status, depth, p_score, synthesizability, price = tree_analysis(
-        resp.json())
+    num_path, status, depth, p_score, synthesizability, price = tree_analysis(resp.json())
 
     if output == "plausibility":
         return p_score
@@ -1581,13 +1518,11 @@ def ibm_rxn(smiles, api_key, output="confidence", sleep_time=30):
     rxn4chemistry_wrapper = RXN4ChemistryWrapper(api_key=api_key)
     response = rxn4chemistry_wrapper.create_project("test")
     time.sleep(sleep_time)
-    response = rxn4chemistry_wrapper.predict_automatic_retrosynthesis(
-        product=smiles)
+    response = rxn4chemistry_wrapper.predict_automatic_retrosynthesis(product=smiles)
     status = ""
     while status != "SUCCESS":
         time.sleep(sleep_time)
-        results = rxn4chemistry_wrapper.get_predict_automatic_retrosynthesis_results(
-            response["prediction_id"])
+        results = rxn4chemistry_wrapper.get_predict_automatic_retrosynthesis_results(response["prediction_id"])
         status = results["status"]
 
     if output == "confidence":
@@ -1599,22 +1534,19 @@ def ibm_rxn(smiles, api_key, output="confidence", sleep_time=30):
 
 
 class molecule_one_retro:
-
     def __init__(self, api_token):
         try:
             from m1wrapper import MoleculeOneWrapper
         except:
             try:
-                install(
-                    "git+https://github.com/molecule-one/m1wrapper-python@v1")
+                install("git+https://github.com/molecule-one/m1wrapper-python@v1")
                 from m1wrapper import MoleculeOneWrapper
             except:
                 raise ImportError(
                     "Install Molecule.One Wrapper via pip install git+https://github.com/molecule-one/m1wrapper-python@v1"
                 )
 
-        self.m1wrapper = MoleculeOneWrapper(api_token,
-                                            "https://tdc.molecule.one")
+        self.m1wrapper = MoleculeOneWrapper(api_token, "https://tdc.molecule.one")
 
     def __call__(self, smiles):
         if isinstance(smiles, str):
@@ -1622,10 +1554,7 @@ class molecule_one_retro:
 
         search = self.m1wrapper.run_batch_search(
             targets=smiles,
-            parameters={
-                "exploratory_search": False,
-                "detail_level": "score"
-            },
+            parameters={"exploratory_search": False, "detail_level": "score"},
         )
 
         status_cur = search.get_status()
@@ -1642,8 +1571,7 @@ class molecule_one_retro:
                 if status_cur != status:
                     print_sys(status)
             status_cur = status
-        result = search.get_results(precision=5,
-                                    only=["targetSmiles", "result"])
+        result = search.get_results(precision=5, only=["targetSmiles", "result"])
         return {i["targetSmiles"]: i["result"] for i in result}
 
 
@@ -1715,11 +1643,7 @@ class PyScreener_meta:
 class Score_3d:
     """Evaluate Vina score (force field) for a conformer binding to a receptor"""
 
-    def __init__(self,
-                 receptor_pdbqt_file,
-                 center,
-                 box_size,
-                 scorefunction="vina"):
+    def __init__(self, receptor_pdbqt_file, center, box_size, scorefunction="vina"):
         try:
             from vina import Vina
         except:
@@ -1735,9 +1659,7 @@ class Score_3d:
         try:
             self.v.compute_vina_maps(center=self.center, box_size=self.box_size)
         except:
-            raise ValueError(
-                "Cannot compute the affinity map, please check center and box_size"
-            )
+            raise ValueError("Cannot compute the affinity map, please check center and box_size")
 
     def __call__(self, ligand_pdbqt_file, minimize=True):
         try:
@@ -1755,11 +1677,7 @@ class Score_3d:
 class Vina_3d:
     """Perform docking search from a conformer."""
 
-    def __init__(self,
-                 receptor_pdbqt_file,
-                 center,
-                 box_size,
-                 scorefunction="vina"):
+    def __init__(self, receptor_pdbqt_file, center, box_size, scorefunction="vina"):
         try:
             from vina import Vina
         except:
@@ -1775,15 +1693,9 @@ class Vina_3d:
         try:
             self.v.compute_vina_maps(center=self.center, box_size=self.box_size)
         except:
-            raise ValueError(
-                "Cannot compute the affinity map, please check center and box_size"
-            )
+            raise ValueError("Cannot compute the affinity map, please check center and box_size")
 
-    def __call__(self,
-                 ligand_pdbqt_file,
-                 output_file="out.pdbqt",
-                 exhaustiveness=8,
-                 n_poses=10):
+    def __call__(self, ligand_pdbqt_file, output_file="out.pdbqt", exhaustiveness=8, n_poses=10):
         try:
             self.v.set_ligand_from_file(ligand_pdbqt_file)
             self.v.dock(exhaustiveness=exhaustiveness, n_poses=n_poses)
@@ -1798,11 +1710,7 @@ class Vina_3d:
 class Vina_smiles:
     """Perform docking search from a conformer."""
 
-    def __init__(self,
-                 receptor_pdbqt_file,
-                 center,
-                 box_size,
-                 scorefunction="vina"):
+    def __init__(self, receptor_pdbqt_file, center, box_size, scorefunction="vina"):
         try:
             from vina import Vina
         except:
@@ -1819,15 +1727,9 @@ class Vina_smiles:
         try:
             self.v.compute_vina_maps(center=self.center, box_size=self.box_size)
         except:
-            raise ValueError(
-                "Cannot compute the affinity map, please check center and box_size"
-            )
+            raise ValueError("Cannot compute the affinity map, please check center and box_size")
 
-    def __call__(self,
-                 ligand_smiles,
-                 output_file="out.pdbqt",
-                 exhaustiveness=8,
-                 n_poses=10):
+    def __call__(self, ligand_smiles, output_file="out.pdbqt", exhaustiveness=8, n_poses=10):
         try:
             m = Chem.MolFromSmiles(ligand_smiles)
             m = Chem.AddHs(m)
@@ -1878,30 +1780,29 @@ def smina(ligand, protein, score_only=False, raw_input=False):
     if raw_input:
         mol_coord, mol_atom = ligand
         # 1. write out to xyz file
-        f = open(f"temp_ligand.xyz", "w")
+        f = open("temp_ligand.xyz", "w")
         n_atoms = len(mol_atom)
         f.write("%d\n\n" % n_atoms)
         for atom_i in range(n_atoms):
             atom = mol_atom[atom_i]
-            f.write("%s %.9f %.9f %.9f\n" % (
-                atom,
-                mol_coord[atom_i, 0],
-                mol_coord[atom_i, 1],
-                mol_coord[atom_i, 2],
-            ))
+            f.write(
+                "%s %.9f %.9f %.9f\n"
+                % (
+                    atom,
+                    mol_coord[atom_i, 0],
+                    mol_coord[atom_i, 1],
+                    mol_coord[atom_i, 2],
+                )
+            )
         f.close()
         # 2. convert to sdf file
         try:
-            os.system(f"obabel temp_ligand.xyz -O temp_ligand.sdf")
+            os.system("obabel temp_ligand.xyz -O temp_ligand.sdf")
         except:
-            raise ImportError(
-                "Please install openbabel by 'conda install -c conda-forge openbabel'!"
-            )
+            raise ImportError("Please install openbabel by 'conda install -c conda-forge openbabel'!")
         ligand = "temp_ligand.sdf"
     if score_only:
-        msg = os.popen(
-            f"./{smina_model_path} -l {ligand} -r {protein} --score_only").read(
-            )
+        msg = os.popen(f"./{smina_model_path} -l {ligand} -r {protein} --score_only").read()
         return float(msg.split("\n")[-7].split(" ")[-2])
     else:
         os.system(f"./{smina_model_path} -l {ligand} -r {protein} --score_only")

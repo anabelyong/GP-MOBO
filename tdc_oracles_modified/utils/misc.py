@@ -1,10 +1,12 @@
 """miscellaneous utilities functions
 """
-import os, sys
+
+import pickle
+import subprocess
+import sys
+
 import numpy as np
 import pandas as pd
-import subprocess
-import pickle
 from fuzzywuzzy import fuzz
 
 
@@ -32,10 +34,7 @@ def fuzzy_search(name, dataset_names):
     if s in dataset_names:
         return s
     else:
-        raise ValueError(
-            s +
-            " does not belong to this task, please refer to the correct task name!"
-        )
+        raise ValueError(s + " does not belong to this task, please refer to the correct task name!")
 
 
 def get_closet_match(predefined_tokens, test_token, threshold=0.8):
@@ -57,9 +56,7 @@ def get_closet_match(predefined_tokens, test_token, threshold=0.8):
 
     for token in predefined_tokens:
         # print(token)
-        prob_list.append(fuzz.ratio(
-            str(token).lower(),
-            str(test_token).lower()))
+        prob_list.append(fuzz.ratio(str(token).lower(), str(test_token).lower()))
 
     assert len(prob_list) == len(predefined_tokens)
 
@@ -69,9 +66,7 @@ def get_closet_match(predefined_tokens, test_token, threshold=0.8):
     # match similarity is low
     if prob_max / 100 < threshold:
         print_sys(predefined_tokens)
-        raise ValueError(
-            test_token, "does not match to available values. "
-            "Please double check.")
+        raise ValueError(test_token, "does not match to available values. " "Please double check.")
     return token_max, prob_max / 100
 
 

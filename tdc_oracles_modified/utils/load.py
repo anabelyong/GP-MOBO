@@ -1,44 +1,31 @@
-"""wrapper for download various dataset 
+"""wrapper for download various dataset
 """
-import requests
-from zipfile import ZipFile
-import os, sys
-import pandas as pd
-import numpy as np
+
+import os
 import pickle
+import sys
+from collections import defaultdict
+from zipfile import ZipFile
+
+import numpy as np
+import pandas as pd
+import requests
 from pandas.errors import EmptyDataError
 from tqdm import tqdm
 
 from ..metadata import (
-    name2type,
-    name2id,
-    name2idlist,
-    dataset_list,
-    dataset_names,
-    benchmark_names,
     benchmark2id,
     benchmark2type,
-)
-from ..metadata import (
-    property_names,
-    paired_dataset_names,
-    single_molecule_dataset_names,
-)
-from ..metadata import (
-    retrosyn_dataset_names,
-    forwardsyn_dataset_names,
-    molgenpaired_dataset_names,
-    generation_datasets,
-)
-from ..metadata import (
+    benchmark_names,
+    name2id,
+    name2idlist,
+    name2type,
     oracle2id,
-    receptor2id,
-    download_oracle_names,
-    trivial_oracle_names,
-    oracle_names,
     oracle2type,
+    oracle_names,
+    receptor2id,
+    trivial_oracle_names,
 )
-from collections import defaultdict
 
 receptor_names = list(receptor2id.keys())
 sys.path.append("../")
@@ -67,17 +54,11 @@ def download_wrapper(name, path, dataset_names):
             if not os.path.exists(path):
                 os.mkdir(path)
 
-            if os.path.exists(
-                    os.path.join(
-                        path, name + "-" + str(i + 1) + "." + name2type[name])):
+            if os.path.exists(os.path.join(path, name + "-" + str(i + 1) + "." + name2type[name])):
                 print_sys("Found local copy...")
             else:
                 print_sys("Downloading...")
-                dataverse_download(dataset_path,
-                                   path,
-                                   name,
-                                   name2type,
-                                   id=i + 1)
+                dataverse_download(dataset_path, path, name, name2type, id=i + 1)
 
         return name
     else:
@@ -117,21 +98,12 @@ def zip_data_download_wrapper(name, path, dataset_names):
                 os.mkdir(path)
 
             if os.path.exists(os.path.join(path, name + "-" + str(i + 1))):
-                print_sys(
-                    f"Found local copy for {i+1}/{len(name2idlist[name])} file..."
-                )
+                print_sys(f"Found local copy for {i+1}/{len(name2idlist[name])} file...")
             else:
                 print_sys(f"Downloading {i+1}/{len(name2idlist[name])} file...")
-                dataverse_download(dataset_path,
-                                   path,
-                                   name,
-                                   name2type,
-                                   id=i + 1)
-                print_sys(
-                    f"Extracting zip {i+1}/{len(name2idlist[name])} file...")
-                with ZipFile(
-                        os.path.join(path, name + "-" + str(i + 1) + ".zip"),
-                        "r") as zip:
+                dataverse_download(dataset_path, path, name, name2type, id=i + 1)
+                print_sys(f"Extracting zip {i+1}/{len(name2idlist[name])} file...")
+                with ZipFile(os.path.join(path, name + "-" + str(i + 1) + ".zip"), "r") as zip:
                     zip.extractall(path=os.path.join(path))
         if not os.path.exists(os.path.join(path, name)):
             os.mkdir(os.path.join(path, name))
@@ -205,8 +177,7 @@ def oracle_download_wrapper(name, path, oracle_names):
         print_sys("Found local copy...")
     else:
         print_sys("Downloading Oracle...")
-        dataverse_download(dataset_path, path, name,
-                           oracle2type)  ## to-do to-check
+        dataverse_download(dataset_path, path, name, oracle2type)  ## to-do to-check
         print_sys("Done!")
     return name
 
@@ -231,17 +202,14 @@ def receptor_download_wrapper(name, path):
     if not os.path.exists(path):
         os.mkdir(path)
 
-    if os.path.exists(os.path.join(path, name + ".pdbqt")) and os.path.exists(
-            os.path.join(path, name + ".pdb")):
+    if os.path.exists(os.path.join(path, name + ".pdbqt")) and os.path.exists(os.path.join(path, name + ".pdb")):
         print_sys("Found local copy...")
     else:
         print_sys("Downloading receptor...")
         receptor2type = defaultdict(lambda: "pdbqt")
-        dataverse_download(dataset_paths[0], path, name,
-                           receptor2type)  ## to-do to-check
+        dataverse_download(dataset_paths[0], path, name, receptor2type)  ## to-do to-check
         receptor2type = defaultdict(lambda: "pdb")
-        dataverse_download(dataset_paths[1], path, name,
-                           receptor2type)  ## to-do to-check
+        dataverse_download(dataset_paths[1], path, name, receptor2type)  ## to-do to-check
         print_sys("Done!")
     return name
 
@@ -291,21 +259,19 @@ def pd_load(name, path):
     """
     try:
         if name2type[name] == "tab":
-            df = pd.read_csv(os.path.join(path, name + "." + name2type[name]),
-                             sep="\t")
+            df = pd.read_csv(os.path.join(path, name + "." + name2type[name]), sep="\t")
         elif name2type[name] == "csv":
             df = pd.read_csv(os.path.join(path, name + "." + name2type[name]))
         elif name2type[name] == "xlsx":
             df = pd.read_excel(os.path.join(path, name + "." + name2type[name]))
         elif name2type[name] == "pkl":
-            df = pd.read_pickle(os.path.join(path,
-                                             name + "." + name2type[name]))
+            df = pd.read_pickle(os.path.join(path, name + "." + name2type[name]))
         elif name2type[name] == "zip":
             df = pd.read_pickle(os.path.join(path, name + "/" + name + ".pkl"))
         elif name2type[name] == "h5ad":
             import anndata
-            adata = anndata.read_h5ad(
-                os.path.join(path, name + "." + name2type[name]))
+
+            adata = anndata.read_h5ad(os.path.join(path, name + "." + name2type[name]))
             # df = pd.DataFrame(adata.X.toarray(), columns=adata.var_names, index=adata.obs_names)
             # TODO: multi-index would help include var information in columns
             # multi_index = pd.MultiIndex.from_frame(adata.var.reset_index())
@@ -314,8 +280,9 @@ def pd_load(name, path):
         elif name2type[name] == "json":
             # df = pd.read_json(os.path.join(path, name + "." + name2type[name]))
             import json
+
             file_path = os.path.join(path, name + "." + name2type[name])
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 file_content = json.load(f)
             maxlen = max(len(x) for x in file_content.values())
             for k, v in file_content.items():
@@ -325,8 +292,8 @@ def pd_load(name, path):
 
         elif name2type[name] == "pth":
             import torch
-            tensors = torch.load(
-                os.path.join(path, name + "." + name2type[name]))
+
+            tensors = torch.load(os.path.join(path, name + "." + name2type[name]))
             dfs = {}
             if isinstance(tensors, dict):
                 for k, v in tensors.items():
@@ -341,14 +308,13 @@ def pd_load(name, path):
                 raise Exception("encountered non-tensor")
 
         else:
-            raise ValueError(
-                "The file type must be one of tab/csv/xlsx/pickle/zip.")
+            raise ValueError("The file type must be one of tab/csv/xlsx/pickle/zip.")
         try:
             df = df.drop_duplicates()
         except:
             pass
         return df
-    except (EmptyDataError, EOFError) as e:
+    except (EmptyDataError, EOFError):
         import sys
 
         sys.exit(
@@ -358,13 +324,13 @@ def pd_load(name, path):
 
 def load_json_from_txt_file(name, path):
     import json
-    import re
+
     name = download_wrapper(name, path, [name])
     file_path = os.path.join(path, name + ".txt")
-    with open(file_path, 'r') as f:
+    with open(file_path, "r") as f:
         data = f.read()
         # data = re.sub(r"(?<!\\)'", '"', data)
-        data = data.replace("\'", "\"")
+        data = data.replace("'", '"')
         file_content = json.loads(data)
     maxlen = max(len(x) for x in file_content.values())
     for k, v in file_content.items():
@@ -396,8 +362,7 @@ def property_dataset_load(name, path, target, dataset_names):
             target = fuzzy_search(target, df.columns.values)
         # df = df.T.drop_duplicates().T ### does not work
         # df2 = df.loc[:,~df.T.duplicated(keep='first')]  ### does not work
-        df2 = df.loc[:,
-                     ~df.columns.duplicated()]  ### remove the duplicate columns
+        df2 = df.loc[:, ~df.columns.duplicated()]  ### remove the duplicate columns
         df = df2
         df = df[df[target].notnull()].reset_index(drop=True)
     except:
@@ -405,9 +370,7 @@ def property_dataset_load(name, path, target, dataset_names):
             if name2type[name] == "pkl":
                 import pickle
 
-                file_content = pickle.load(
-                    open(os.path.join(path, name + "." + name2type[name]),
-                         "rb"))
+                file_content = pickle.load(open(os.path.join(path, name + "." + name2type[name]), "rb"))
             else:
                 file_content = " ".join(f.readlines())
             flag = "Service Unavailable" in " ".join(file_content)
@@ -421,8 +384,7 @@ def property_dataset_load(name, path, target, dataset_names):
             else:
                 import sys
 
-                sys.exit(
-                    "Please report this error to contact@tdcommons.ai, thanks!")
+                sys.exit("Please report this error to contact@tdcommons.ai, thanks!")
     try:
         return df["X"], df[target], df["ID"]
     except:
@@ -431,19 +393,12 @@ def property_dataset_load(name, path, target, dataset_names):
 
 def resource_dataset_load(name, path, dataset_names):
     if name not in dataset_names:
-        raise ValueError(
-            "Unknown resource dataset {}, should be one of: {}".format(
-                name, dataset_names))
+        raise ValueError("Unknown resource dataset {}, should be one of: {}".format(name, dataset_names))
     name = download_wrapper(name, path, dataset_names)
     return pd_load(name, path)
 
 
-def interaction_dataset_load(name,
-                             path,
-                             target,
-                             dataset_names,
-                             aux_column,
-                             data_config=None):
+def interaction_dataset_load(name, path, target, dataset_names, aux_column, data_config=None):
     """a wrapper to download, process and load two-instance prediction task datasets
 
     Args:
@@ -477,11 +432,9 @@ def interaction_dataset_load(name,
             target = fuzzy_search(target, df.columns.values)
         df = df[df[target].notnull()].reset_index(drop=True)
         if aux_column is None:
-            return df["X1"], df["X2"], df[target], df["ID1"], df[
-                "ID2"], "_", df, data_config is not None
+            return df["X1"], df["X2"], df[target], df["ID1"], df["ID2"], "_", df, data_config is not None
         else:
-            return df["X1"], df["X2"], df[target], df["ID1"], df["ID2"], df[
-                aux_column], df, data_config is not None
+            return df["X1"], df["X2"], df[target], df["ID1"], df["ID2"], df[aux_column], df, data_config is not None
 
     except:
         with open(os.path.join(path, name + "." + name2type[name]), "r") as f:
@@ -495,8 +448,7 @@ def interaction_dataset_load(name,
             else:
                 import sys
 
-                sys.exit(
-                    "Please report this error to cosamhkx@gmail.com, thanks!")
+                sys.exit("Please report this error to cosamhkx@gmail.com, thanks!")
 
 
 def multi_dataset_load(name, path, dataset_names):
@@ -517,8 +469,7 @@ def multi_dataset_load(name, path, dataset_names):
     return df
 
 
-def generation_paired_dataset_load(name, path, dataset_names, input_name,
-                                   output_name):
+def generation_paired_dataset_load(name, path, dataset_names, input_name, output_name):
     """a wrapper to download, process and load generation-paired task datasets
 
     Args:
@@ -599,26 +550,18 @@ def bi_distribution_dataset_load(
 
     if name == "pdbbind":
         print_sys("Processing (this may take long)...")
-        protein, ligand = process_pdbbind(path, name, return_pocket,
-                                          remove_protein_Hs, remove_ligand_Hs,
-                                          keep_het)
+        protein, ligand = process_pdbbind(path, name, return_pocket, remove_protein_Hs, remove_ligand_Hs, keep_het)
     elif name == "dude":
         print_sys("Processing (this may take long)...")
         if return_pocket:
             raise ImportError("DUD-E does not support pocket extraction yet")
-        protein, ligand = process_dude(path, name, return_pocket,
-                                       remove_protein_Hs, remove_ligand_Hs,
-                                       keep_het)
+        protein, ligand = process_dude(path, name, return_pocket, remove_protein_Hs, remove_ligand_Hs, keep_het)
     elif name == "scpdb":
         print_sys("Processing (this may take long)...")
-        protein, ligand = process_scpdb(path, name, return_pocket,
-                                        remove_protein_Hs, remove_ligand_Hs,
-                                        keep_het)
+        protein, ligand = process_scpdb(path, name, return_pocket, remove_protein_Hs, remove_ligand_Hs, keep_het)
     elif name == "crossdock":
         print_sys("Processing (this may take long)...")
-        protein, ligand = process_crossdock(path, name, return_pocket,
-                                            remove_protein_Hs, remove_ligand_Hs,
-                                            keep_het)
+        protein, ligand = process_crossdock(path, name, return_pocket, remove_protein_Hs, remove_ligand_Hs, keep_het)
 
     return protein, ligand
 
@@ -727,14 +670,10 @@ def process_pdbbind(
             total_ct += 1
             try:
                 if return_pocket:
-                    protein = PandasPdb().read_pdb(
-                        os.path.join(path, f"{file}/{file}_pocket.pdb"))
+                    protein = PandasPdb().read_pdb(os.path.join(path, f"{file}/{file}_pocket.pdb"))
                 else:
-                    protein = PandasPdb().read_pdb(
-                        os.path.join(path, f"{file}/{file}_protein.pdb"))
-                ligand = Chem.SDMolSupplier(os.path.join(
-                    path, f"{file}/{file}_ligand.sdf"),
-                                            sanitize=False)[0]
+                    protein = PandasPdb().read_pdb(os.path.join(path, f"{file}/{file}_protein.pdb"))
+                ligand = Chem.SDMolSupplier(os.path.join(path, f"{file}/{file}_ligand.sdf"), sanitize=False)[0]
                 ligand = extract_atom_from_mol(ligand, remove_ligand_Hs)
                 # if ligand contains unallowed atoms
                 if ligand is None:
@@ -811,16 +750,15 @@ def process_crossdock(
             else:
                 # full protein not stored in the preprocessed crossdock by Luo et al 2021
                 protein = PandasPdb().read_pdb(os.path.join(path, pocket_fn))
-            ligand = Chem.SDMolSupplier(os.path.join(path, ligand_fn),
-                                        sanitize=False)[0]
+            ligand = Chem.SDMolSupplier(os.path.join(path, ligand_fn), sanitize=False)[0]
             ligand = extract_atom_from_mol(ligand, remove_ligand_Hs)
             if ligand is None:
                 continue
             else:
                 ligand_coord, ligand_atom_type = ligand
             protein_coord, protein_atom_type = extract_atom_from_protein(
-                protein.df["ATOM"], protein.df["HETATM"], remove_protein_Hs,
-                keep_het)
+                protein.df["ATOM"], protein.df["HETATM"], remove_protein_Hs, keep_het
+            )
             protein_coords.append(protein_coord)
             ligand_coords.append(ligand_coord)
             protein_atom_types.append(protein_atom_type)
@@ -872,24 +810,19 @@ def process_dude(
     failure = 0
     total_ct = 0
     for idx, file in enumerate(tqdm(files)):
-        protein = PandasPdb().read_pdb(
-            os.path.join(path, f"{file}/receptor.pdb"))
+        protein = PandasPdb().read_pdb(os.path.join(path, f"{file}/receptor.pdb"))
         if not os.path.exists(os.path.join(path, f"{file}/actives_final.sdf")):
             os.system(f"gzip -d {path}/{file}/actives_final.sdf.gz")
-        crystal_ligand = Chem.MolFromMol2File(os.path.join(
-            path, f"{file}/crystal_ligand.mol2"),
-                                              sanitize=False)
+        crystal_ligand = Chem.MolFromMol2File(os.path.join(path, f"{file}/crystal_ligand.mol2"), sanitize=False)
         crystal_ligand = extract_atom_from_mol(crystal_ligand, remove_ligand_Hs)
         if crystal_ligand is None:
             continue
         else:
             crystal_ligand_coord, crystal_ligand_atom_type = crystal_ligand
-        ligands = Chem.SDMolSupplier(os.path.join(path,
-                                                  f"{file}/actives_final.sdf"),
-                                     sanitize=False)
+        ligands = Chem.SDMolSupplier(os.path.join(path, f"{file}/actives_final.sdf"), sanitize=False)
         protein_coord, protein_atom_type = extract_atom_from_protein(
-            protein.df["ATOM"], protein.df["HETATM"], remove_protein_Hs,
-            keep_het)
+            protein.df["ATOM"], protein.df["HETATM"], remove_protein_Hs, keep_het
+        )
         protein_coords.append(protein_coord)
         ligand_coords.append(crystal_ligand_coord)
         protein_atom_types.append(protein_atom_type)
@@ -957,14 +890,10 @@ def process_scpdb(
         total_ct += 1
         try:
             if return_pocket:
-                protein = PandasMol2().read_mol2(
-                    os.path.join(path, f"{file}/site.mol2"))
+                protein = PandasMol2().read_mol2(os.path.join(path, f"{file}/site.mol2"))
             else:
-                protein = PandasMol2().read_mol2(
-                    os.path.join(path, f"{file}/protein.mol2"))
-            ligand = Chem.SDMolSupplier(os.path.join(path,
-                                                     f"{file}/ligand.sdf"),
-                                        sanitize=False)[0]
+                protein = PandasMol2().read_mol2(os.path.join(path, f"{file}/protein.mol2"))
+            ligand = Chem.SDMolSupplier(os.path.join(path, f"{file}/ligand.sdf"), sanitize=False)[0]
             ligand = extract_atom_from_mol(ligand, remove_Hs=remove_ligand_Hs)
             # if ligand contains unallowed atoms
             if ligand is None:
@@ -972,7 +901,8 @@ def process_scpdb(
             else:
                 ligand_coord, ligand_atom_type = ligand
             protein_coord, protein_atom_type = extract_atom_from_protein(
-                protein.df, None, remove_Hs=remove_protein_Hs, keep_het=False)
+                protein.df, None, remove_Hs=remove_protein_Hs, keep_het=False
+            )
             protein_coords.append(protein_coord)
             ligand_coords.append(ligand_coord)
             protein_atom_types.append(protein_atom_type)
@@ -1019,11 +949,7 @@ def extract_atom_from_mol(rdmol, remove_Hs):
         for idx in range(rdmol.GetNumAtoms())
         if not remove_Hs or rdmol.GetAtomWithIdx(idx).GetAtomicNum() != 1
     ]
-    atom_type = [
-        atom.GetAtomicNum()
-        for atom in rdmol.GetAtoms()
-        if not remove_Hs or atom.GetAtomicNum() != 1
-    ]
+    atom_type = [atom.GetAtomicNum() for atom in rdmol.GetAtoms() if not remove_Hs or atom.GetAtomicNum() != 1]
     return np.array(coord), np.array(atom_type)
 
 
@@ -1049,15 +975,11 @@ def extract_atom_from_protein(data_frame, data_frame_het, remove_Hs, keep_het):
     if keep_het and data_frame_het is not None:
         data_frame = pd.concat([data_frame, data_frame_het])
     if remove_Hs:
-        data_frame = data_frame[data_frame["atom_name"].str.startswith("H") ==
-                                False]
+        data_frame = data_frame[data_frame["atom_name"].str.startswith("H") is False]
         data_frame.reset_index(inplace=True, drop=True)
-    x = (data_frame["x_coord"].to_numpy()
-         if "x_coord" in data_frame else data_frame["x"].to_numpy())
-    y = (data_frame["y_coord"].to_numpy()
-         if "y_coord" in data_frame else data_frame["y"].to_numpy())
-    z = (data_frame["z_coord"].to_numpy()
-         if "z_coord" in data_frame else data_frame["z"].to_numpy())
+    x = data_frame["x_coord"].to_numpy() if "x_coord" in data_frame else data_frame["x"].to_numpy()
+    y = data_frame["y_coord"].to_numpy() if "y_coord" in data_frame else data_frame["y"].to_numpy()
+    z = data_frame["z_coord"].to_numpy() if "z_coord" in data_frame else data_frame["z"].to_numpy()
     x = np.expand_dims(x, axis=1)
     y = np.expand_dims(y, axis=1)
     z = np.expand_dims(z, axis=1)
