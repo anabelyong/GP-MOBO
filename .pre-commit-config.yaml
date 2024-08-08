@@ -30,4 +30,7 @@ repos:
     rev: 'v0.0.291'
     hooks:
       - id: ruff
-        args: [--fix]
+        args: [
+          --fix,
+          --extend-ignore=E722,E721,E402
+        ]
