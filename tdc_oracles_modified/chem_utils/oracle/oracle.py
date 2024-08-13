@@ -198,7 +198,6 @@ class SquaredModifier(ScoreModifier):
         return 1.0 - self.coefficient * np.square(self.target_value - x)
 
 
-class AbsoluteScoreModifier(ScoreModifier):
     """
     Score modifier that has a maximum at a given target value, and decreases
     linearly with increasing distance from the target value.
@@ -330,7 +329,6 @@ _fscores = None
 
 
 def readFragmentScores(name="fpscores"):
-
     global _fscores
     # generate the full path filename:
     # if name == "fpscores":
@@ -1015,6 +1013,53 @@ def osimertinib_mpo(test_smiles):
     osimertinib_gmean = gmean([tpsa_score, logp_score, similarity_v1, similarity_v2])
     return osimertinib_gmean
 
+"""
+Second MPO objective we are splitting: osimertinib_mpo:
+Split into 4 different functions instead:
+1) sim(osimertinib, FCFC4)
+2) sim(osimertinib, ECFC6)
+2) TPSA
+3) log P
+"""
+# Individual objective functions
+# Objective 1: TPSA score
+def osimertinib_tpsa_score(test_smiles):
+    tpsa_modifier = MaxGaussianModifier(mu=100, sigma=10)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
+    return tpsa_score
+
+# Objective 2: LogP score
+def osimertinib_logp_score(test_smiles):
+    logp_modifier = MinGaussianModifier(mu=1, sigma=1)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    logp_score = logp_modifier(Descriptors.MolLogP(molecule))
+    return logp_score
+
+# Objective 3: Similarity score based on FCFP4 fingerprint
+def osimertinib_similarity_v1_score(test_smiles):
+    if "osimertinib_fp_fcfc4" not in globals().keys():
+        global osimertinib_fp_fcfc4
+        osimertinib_smiles = "COc1cc(N(C)CCN(C)C)c(NC(=O)C=C)cc1Nc2nccc(n2)c3cn(C)c4ccccc34"
+        osimertinib_fp_fcfc4 = smiles_2_fingerprint_FCFP4(osimertinib_smiles)
+
+    sim_v1_modifier = ClippedScoreModifier(upper_x=0.8)
+    fp_fcfc4 = smiles_2_fingerprint_FCFP4(test_smiles)
+    similarity_v1 = sim_v1_modifier(DataStructs.TanimotoSimilarity(fp_fcfc4, osimertinib_fp_fcfc4))
+    return similarity_v1
+
+# Objective 4: Similarity score based on ECFP6 fingerprint
+def osimertinib_similarity_v2_score(test_smiles):
+    if "osimertinib_fp_ecfc6" not in globals().keys():
+        global osimertinib_fp_ecfc6
+        osimertinib_smiles = "COc1cc(N(C)CCN(C)C)c(NC(=O)C=C)cc1Nc2nccc(n2)c3cn(C)c4ccccc34"
+        osimertinib_fp_ecfc6 = smiles_2_fingerprint_ECFP6(osimertinib_smiles)
+
+    sim_v2_modifier = MinGaussianModifier(mu=0.85, sigma=0.1)
+    fp_ecfc6 = smiles_2_fingerprint_ECFP6(test_smiles)
+    similarity_v2 = sim_v2_modifier(DataStructs.TanimotoSimilarity(fp_ecfc6, osimertinib_fp_ecfc6))
+    return similarity_v2
+
 
 def fexofenadine_mpo(test_smiles):
     if "fexofenadine_fp" not in globals().keys():
@@ -1042,8 +1087,6 @@ Split into 3 different functions instead:
 2) TPSA
 3) log P
 """
-
-
 # Individual objective functions
 def tpsa_score_single(test_smiles):
     tpsa_modifier = MaxGaussianModifier(mu=90, sigma=10)
@@ -1093,6 +1136,51 @@ def ranolazine_mpo(test_smiles):
     ranolazine_gmean = gmean([tpsa_score, logp_score, similarity_value, fluorine_value])
     return ranolazine_gmean
 
+"""
+Third MPO objective we are splitting: ranolazine_mpo:
+Split into 4 different functions instead:
+1)  sim(ranolazine, AP)
+2)  logP
+2)  TPSA
+3)  number of fluorine atoms
+"""
+
+# Objective 1: TPSA score
+def ranolazine_tpsa_score(test_smiles):
+    tpsa_modifier = MaxGaussianModifier(mu=95, sigma=20)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    tpsa_score = tpsa_modifier(Descriptors.TPSA(molecule))
+    return tpsa_score
+
+# Objective 2: LogP score
+def ranolazine_logp_score(test_smiles):
+    logp_modifier = MaxGaussianModifier(mu=7, sigma=1)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    logp_score = logp_modifier(Descriptors.MolLogP(molecule))
+    return logp_score
+
+# Objective 3: Similarity score based on AP fingerprint
+def ranolazine_similarity_value(test_smiles):
+    if "ranolazine_fp" not in globals().keys():
+        global ranolazine_fp
+        ranolazine_smiles = "COc1ccccc1OCC(O)CN2CCN(CC(=O)Nc3c(C)cccc3C)CC2"
+        ranolazine_fp = smiles_2_fingerprint_AP(ranolazine_smiles)
+
+    similar_modifier = ClippedScoreModifier(upper_x=0.7)
+    fp_ap = smiles_2_fingerprint_AP(test_smiles)
+    similarity_value = similar_modifier(DataStructs.TanimotoSimilarity(fp_ap, ranolazine_fp))
+    return similarity_value
+
+# Objective 4: Fluorine atom count score
+def ranolazine_fluorine_value(test_smiles):
+    if "fluorine_counter" not in globals().keys():
+        global fluorine_counter
+        fluorine_counter = AtomCounter("F")
+
+    fluorine_modifier = GaussianModifier(mu=1, sigma=1.0)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    fluorine_value = fluorine_modifier(fluorine_counter(molecule))
+    return fluorine_value
 
 def perindopril_mpo(test_smiles):
     ## no similar_modifier
