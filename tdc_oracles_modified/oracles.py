@@ -95,6 +95,46 @@ class Oracle:
             from .chem_utils import fex_similarity_value_single
 
             self.evaluator_func = fex_similarity_value_single
+        # Osimertinib MPO separated into 4 different oracle functions, TPSA, LOGP, Osimertinib similarity v1 and v2
+        elif self.name == "osimertinib_tpsa_score":
+            from .chem_utils import osimertinib_tpsa_score
+
+            self.evaluator_func = osimertinib_tpsa_score
+        
+        elif self.name == "osimertinib_logp_score":
+            from .chem_utils import osimertinib_logp_score
+
+            self.evaluator_func = osimertinib_logp_score
+        
+        elif self.name == "osimertinib_similarity_v1_score":
+            from .chem_utils import osimertinib_similarity_v1_score
+
+            self.evaluator_func = osimertinib_similarity_v1_score
+        
+        elif self.name == "osimertinib_similarity_v2_score":
+            from .chem_utils import osimertinib_similarity_v2_score
+
+            self.evaluator_func = osimertinib_similarity_v2_score
+        # Ranolazine MPO separated into 4 different oracle functions, logP, TPSA, ranolazine similarity, number of fluorine atoms
+        elif self.name == "ranolazine_tpsa_score":
+            from .chem_utils import ranolazine_tpsa_score
+
+            self.evaluator_func = ranolazine_tpsa_score
+        
+        elif self.name == "ranolazine_logp_score":
+            from .chem_utils import ranolazine_logp_score
+
+            self.evaluator_func = ranolazine_logp_score
+        
+        elif self.name == "ranolazine_similarity_value":
+            from .chem_utils import ranolazine_similarity_value
+
+            self.evaluator_func = ranolazine_similarity_value
+        
+        elif self.name == "ranolazine_fluorine_value":
+            from .chem_utils import ranolazine_fluorine_value
+
+            self.evaluator_func = ranolazine_fluorine_value
         # elif self.name == 'drd2':
         elif "drd2" in self.name:
             from .chem_utils import drd2
