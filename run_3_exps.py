@@ -6,7 +6,7 @@ from dockstring.dataset import load_dataset
 from acquisition_funcs.hypervolume import Hypervolume, infer_reference_point
 from acquisition_funcs.pareto import pareto_front
 from kern_gp.gp_model import independent_tanimoto_gp_predict
-from utils import evaluate_objectives
+from utils.utils import evaluate_objectives
 
 def expected_hypervolume_improvement(pred_means, pred_vars, reference_point, pareto_front, N=100):
     num_points, num_objectives = pred_means.shape
