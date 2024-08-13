@@ -182,4 +182,4 @@ if __name__ == "__main__":
     results = run_experiment(repeats, n_iterations)
 
     # Write results to a CSV file
-    write_to_csv(results, "bo_experiments_single_objective_3_runs_results.csv")
+    write_to_csv(results, "ei_bo_experiments_single_objective_3_runs_results.csv")
