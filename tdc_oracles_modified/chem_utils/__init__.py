@@ -1,4 +1,4 @@
-#added additional separated MPOs at the bottom, look at comments 
+# Add additional objectives for the MPO methods <- to test
 from .oracle.oracle import (
     PyScreener_meta,
     Vina_3d,
@@ -52,4 +52,8 @@ from .oracle.oracle import (
     ranolazine_logp_score, #ranolazine separated MPO
     ranolazine_similarity_value, #ranolazine separated MPO
     ranolazine_fluorine_value, #ranolazine separated MPO
+    perindopril_similarity_value, #perindopril separated MPO
+    perindopril_aromatic_rings, #perindopril separated MPO
+    amlodipine_similarity_value, #amlodipine separated MPO
+    amlodipine_num_rings_value, #amlodipine separated MPO
 )
