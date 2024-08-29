@@ -1,0 +1,120 @@
+Start BO iteration 0. Dataset size=(20, 1)
+Max acquisition value (EI): [0.23216582]
+f1 shape: (1,)
+Chosen SMILES: Cc1cc(COc2ccc(S(=O)(=O)NCC(C(=O)NO)N3CCN(C(=O)C(C)C)CC3)cc2)c2ccccc2n1 with EI value = [0.23216582]
+Value of chosen SMILES: [[0.62533396]]
+Updated dataset size: (21, 1)
+Start BO iteration 1. Dataset size=(21, 1)
+Max acquisition value (EI): [0.23561348]
+f1 shape: (1,)
+Chosen SMILES: CCOc1ccc(NC(=O)N2CCC(NC(=O)C(Cc3ccccc3OC)NC(C)=O)CC2)cc1 with EI value = [0.23561348]
+Value of chosen SMILES: [[0.65037703]]
+Updated dataset size: (22, 1)
+Start BO iteration 2. Dataset size=(22, 1)
+Max acquisition value (EI): [0.24355724]
+f1 shape: (1,)
+Chosen SMILES: CCC(C)C(NC(=O)OCc1ccccc1)C(=O)OCC(=O)N1CCN(c2ccc(OC)cc2)CC1 with EI value = [0.24355724]
+Value of chosen SMILES: [[0.61146332]]
+Updated dataset size: (23, 1)
+Start BO iteration 3. Dataset size=(23, 1)
+Max acquisition value (EI): [0.24550274]
+f1 shape: (1,)
+Chosen SMILES: CCOc1ccccc1NC(=O)CCN1CCN(S(=O)(=O)c2ccc(OC)cc2)CC1 with EI value = [0.24550274]
+Value of chosen SMILES: [[0.68147153]]
+Updated dataset size: (24, 1)
+Start BO iteration 4. Dataset size=(24, 1)
+Max acquisition value (EI): [0.25435476]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(S(=O)(=O)N(Cc2ccc3c(c2)OCO3)C(CCC(=O)N2CCN(C)CC2)C(=O)NO)cc1 with EI value = [0.25435476]
+Value of chosen SMILES: [[0.62782746]]
+Updated dataset size: (25, 1)
+Start BO iteration 5. Dataset size=(25, 1)
+Max acquisition value (EI): [0.25818369]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(S(=O)(=O)N(C)CC(=O)N2CCN(c3ccccc3)CC2)cc1 with EI value = [0.25818369]
+Value of chosen SMILES: [[0.3340828]]
+Updated dataset size: (26, 1)
+Start BO iteration 6. Dataset size=(26, 1)
+Max acquisition value (EI): [0.25359228]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(Cn2ccc(C)c(NC(=O)C(Cc3ccc(CC(=O)O)cc3)NC(C)=O)c2=O)cc1 with EI value = [0.25359228]
+Value of chosen SMILES: [[0.58863373]]
+Updated dataset size: (27, 1)
+Start BO iteration 7. Dataset size=(27, 1)
+Max acquisition value (EI): [0.25697359]
+f1 shape: (1,)
+Chosen SMILES: CCC(C)C(NC(=O)c1cccc(Cn2ccnc2)c1)C(=O)NNS(=O)(=O)c1ccc(OC)cc1 with EI value = [0.25697359]
+Value of chosen SMILES: [[0.55224187]]
+Updated dataset size: (28, 1)
+Start BO iteration 8. Dataset size=(28, 1)
+Max acquisition value (EI): [0.25550231]
+f1 shape: (1,)
+Chosen SMILES: CCCCOc1ccc(C(=O)n2c(C)c(C(=O)O)c3cc(OC)ccc32)cc1 with EI value = [0.25550231]
+Value of chosen SMILES: [[0.45166133]]
+Updated dataset size: (29, 1)
+Start BO iteration 9. Dataset size=(29, 1)
+Max acquisition value (EI): [0.25463972]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(CC(NC(=O)C2(NC(=O)C(SC(C)=O)C(C)C)CCCC2)C(=O)OCc2ccccc2)cc1 with EI value = [0.25463972]
+Value of chosen SMILES: [[0.61395644]]
+Updated dataset size: (30, 1)
+Start BO iteration 10. Dataset size=(30, 1)
+Max acquisition value (EI): [0.25716449]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(NC(=O)C(Cc2ccccc2)Nc2cc(C)nc(NCCN3CCCC3)n2)cc1 with EI value = [0.25716449]
+Value of chosen SMILES: [[0.63185638]]
+Updated dataset size: (31, 1)
+Start BO iteration 11. Dataset size=(31, 1)
+Max acquisition value (EI): [0.26062017]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(OC)c(C(=O)CCC(=O)NC(Cc2ccccc2)C(=O)C(N)=O)c1 with EI value = [0.26062017]
+Value of chosen SMILES: [[0.5788315]]
+Updated dataset size: (32, 1)
+Start BO iteration 12. Dataset size=(32, 1)
+Max acquisition value (EI): [0.2601333]
+f1 shape: (1,)
+Chosen SMILES: CNC(=O)C(Cc1ccc(OC)cc1)NC(=O)C(CC(C)C)C(S)CC(=O)OCc1ccccc1 with EI value = [0.2601333]
+Value of chosen SMILES: [[0.58504742]]
+Updated dataset size: (33, 1)
+Start BO iteration 13. Dataset size=(33, 1)
+Max acquisition value (EI): [0.2596065]
+f1 shape: (1,)
+Chosen SMILES: COc1ccc(CN(Cc2ccccc2)C(=O)c2ccno2)cc1COc1ccc(NC(C)=O)cc1 with EI value = [0.2596065]
+Value of chosen SMILES: [[0.50281986]]
+Updated dataset size: (34, 1)
+Start BO iteration 14. Dataset size=(34, 1)
+Max acquisition value (EI): [0.25911151]
+f1 shape: (1,)
+Chosen SMILES: COC(=O)NC(Cc1ccccc1)C(=O)NC(Cc1ccc(NS(=O)(=O)O)cc1)c1csc(C)n1 with EI value = [0.25911151]
+Value of chosen SMILES: [[0.55950392]]
+Updated dataset size: (35, 1)
+Start BO iteration 15. Dataset size=(35, 1)
+Max acquisition value (EI): [0.2589543]
+f1 shape: (1,)
+Chosen SMILES: COCC(NC(C)=O)C(=O)NCc1ccc(Oc2cccc(C)c2)cc1 with EI value = [0.2589543]
+Value of chosen SMILES: [[0.43078047]]
+Updated dataset size: (36, 1)
+Start BO iteration 16. Dataset size=(36, 1)
+Max acquisition value (EI): [0.25853263]
+f1 shape: (1,)
+Chosen SMILES: Cc1ccc(S(=O)(=O)NC(Cc2ccccc2)C(=O)N2CCCC2C(=O)O)cc1 with EI value = [0.25853263]
+Value of chosen SMILES: [[0.63937749]]
+Updated dataset size: (37, 1)
+Start BO iteration 17. Dataset size=(37, 1)
+Max acquisition value (EI): [0.26178513]
+f1 shape: (1,)
+Chosen SMILES: COc1cccc(OC)c1-c1ccc(CC(Nc2ccc(S(=O)(=O)N3CCCC3)cc2)C(=O)O)cc1 with EI value = [0.26178513]
+Value of chosen SMILES: [[0.64827788]]
+Updated dataset size: (38, 1)
+Start BO iteration 18. Dataset size=(38, 1)
+Max acquisition value (EI): [0.26447613]
+f1 shape: (1,)
+Chosen SMILES: Cc1cccc(NC(=O)COC(=O)CCc2ccc(S(=O)(=O)N3CCOCC3)cc2)c1C with EI value = [0.26447613]
+Value of chosen SMILES: [[0.621472]]
+Updated dataset size: (39, 1)
+Start BO iteration 19. Dataset size=(39, 1)
+Max acquisition value (EI): [0.26635924]
+f1 shape: (1,)
+Chosen SMILES: Cc1ccc(C)c(NC(=O)COC(=O)c2ccc(S(=O)(=O)N3CCCC3)cc2)c1 with EI value = [0.26635924]
+Value of chosen SMILES: [[0.57962415]]
+Updated dataset size: (40, 1)
