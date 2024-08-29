@@ -135,6 +135,26 @@ class Oracle:
             from .chem_utils import ranolazine_fluorine_value
 
             self.evaluator_func = ranolazine_fluorine_value
+        # Perindopril MPO separated into 2 different oracle functions:  perindopril similarity and number of aromatic rings
+        elif self.name == "perindopril_similarity_value":
+            from .chem_utils import perindopril_similarity_value
+
+            self.evaluator_func = perindopril_similarity_value
+        
+        elif self.name == "perindopril_aromatic_rings":
+            from .chem_utils import perindopril_aromatic_rings
+
+            self.evaluator_func = perindopril_aromatic_rings
+        # Amlodipine MPO separated into 2 different oracle functions:  amlodipine similarity and number of rings
+        elif self.name == "amlodipine_similarity_value":
+            from .chem_utils import amlodipine_similarity_value
+
+            self.evaluator_func = amlodipine_similarity_value
+        
+        elif self.name == "amlodipine_num_rings_value":
+            from .chem_utils import amlodipine_num_rings_value
+
+            self.evaluator_func = amlodipine_num_rings_value
         # elif self.name == 'drd2':
         elif "drd2" in self.name:
             from .chem_utils import drd2
