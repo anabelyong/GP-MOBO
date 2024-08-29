@@ -1204,6 +1204,36 @@ def perindopril_mpo(test_smiles):
     perindopril_gmean = gmean([similarity_value, num_aromatic_rings_value])
     return perindopril_gmean
 
+"""
+4th MPO objective we are splitting: perindopril_mpo (2D objective case)
+Split into 2 different functions instead:
+1)  sim(perindopril, ECFC4)
+2)  number aromatic rings
+"""
+
+def perindopril_similarity_value(test_smiles):
+    """Calculate the Tanimoto similarity between the test SMILES and the reference perindopril."""
+    if "perindopril_fp" not in globals():
+        global perindopril_fp
+        perindopril_smiles = "O=C(OCC)C(NC(C(=O)N1C(C(=O)O)CC2CCCCC12)C)CCC"
+        perindopril_fp = smiles_2_fingerprint_ECFP4(perindopril_smiles)
+
+    fp_ecfp4 = smiles_2_fingerprint_ECFP4(test_smiles)
+    similarity_value = DataStructs.TanimotoSimilarity(fp_ecfp4, perindopril_fp)
+    
+    return similarity_value
+
+def perindopril_aromatic_rings(test_smiles):
+    """Calculate the aromatic rings modifier value for the test SMILES."""
+    if "num_aromatic_rings" not in globals():
+        def num_aromatic_rings(mol):
+            return rdMolDescriptors.CalcNumAromaticRings(mol)
+
+    arom_rings_modifier = GaussianModifier(mu=2, sigma=0.5)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    num_aromatic_rings_value = arom_rings_modifier(num_aromatic_rings(molecule))
+    
+    return num_aromatic_rings_value
 
 def amlodipine_mpo(test_smiles):
     ## no similar_modifier
@@ -1226,6 +1256,35 @@ def amlodipine_mpo(test_smiles):
     amlodipine_gmean = gmean([similarity_value, num_rings_value])
     return amlodipine_gmean
 
+"""
+5th MPO objective we are splitting: amlodipine_mpo (2D objective case)
+Split into 2 different functions instead:
+1)  sim(amlodipine, ECFC4)
+2)  number rings
+"""
+def amlodipine_similarity_value(test_smiles):
+    """Calculate the Tanimoto similarity between the test SMILES and the reference amlodipine."""
+    if "amlodipine_fp" not in globals():
+        global amlodipine_fp
+        amlodipine_smiles = "Clc1ccccc1C2C(=C(/N/C(=C2/C(=O)OCC)COCCN)C)\C(=O)OC"
+        amlodipine_fp = smiles_2_fingerprint_ECFP4(amlodipine_smiles)
+
+    fp_ecfp4 = smiles_2_fingerprint_ECFP4(test_smiles)
+    similarity_value = DataStructs.TanimotoSimilarity(fp_ecfp4, amlodipine_fp)
+    
+    return similarity_value
+
+def amlodipine_num_rings_value(test_smiles):
+    """Calculate the number of rings modifier value for the test SMILES."""
+    if "num_rings" not in globals():
+        def num_rings(mol):
+            return rdMolDescriptors.CalcNumRings(mol)
+
+    num_rings_modifier = GaussianModifier(mu=3, sigma=0.5)
+    molecule = smiles_to_rdkit_mol(test_smiles)
+    num_rings_value = num_rings_modifier(num_rings(molecule))
+    
+    return num_rings_value
 
 def zaleplon_mpo_prev(test_smiles):
     if "zaleplon_fp" not in globals().keys():
