@@ -10,6 +10,7 @@ GP-MOBO is a novel multi-objective Bayesian Optimization (MOBO) algorithm design
 Python Scripts to Run: 
 1) Dockstring Toy MPO Setup
 2) GUACAMOL MPO Setup
+
 For DockSTRING Toy MPO Setup, go to ```dockstring-test-implementation``` branch, run for 3 experiments:
 ```
 python ehvi_mc_3_trials.py
