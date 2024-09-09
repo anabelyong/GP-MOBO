@@ -1,0 +1,227 @@
+(seed-mobo) anabelyong@Anabels-MacBook-Air seed-mobo-for-molecules % python tanimoto_gpbo_ucb.py 
+Known SMILES:
+['C1=C(C2=C(C=C1O)OC(C(C2=O)=O)C3=CC=C(C(=C3)O)O)O',
+ 'O=S(=O)(N1CCNCCC1)C2=CC=CC=3C2=CC=NC3',
+ 'C=1C=C2S/C(/N(CC)C2=CC1OC)=C\\C(=O)C',
+ 'C=1(N=C(C=2C=NC=CC2)C=CN1)NC=3C=C(NC(C4=CC=C(CN5CCN(CC5)C)C=C4)=O)C=CC3C',
+ 'C1=CC=2C(=CNC2C=C1)C=3C=CN=CC3',
+ 'N1(C2=C(C(N)=NC=N2)C=N1)C3=CC=CC=C3',
+ 'C1(=C2C(C=CC=C2)=NC=N1)NC3=CC(OC)=CC=C3',
+ 'N1C(N(C(C2=CC=CC=C12)=O)CCN3CCC(CC3)=C(C=4C=CC(=CC4)F)C=5C=CC(=CC5)F)=S',
+ 'C1(O[C@@H](CC(C(=CC([C@H]([C@H](C([C@@H](C[C@@H](C=CC=CC=C([C@H](C[C@H]2O[C@](C(C(N3[C@H]1CCCC3)=O)=O)(O)[C@@H](CC2)C)OC)C)C)C)=O)OC)O)C)C)=O)[C@@H](C[C@H]4C[C@@H](OC)[C@H](O)CC4)C)=O',
+ 'O=C1C=2C=3C(=NNC3C=CC2)C4=C1C=CC=C4']
+Initial known_SMILES: ['S1C(C2=CC=C(N3N=CC=C3)C=C2)=C(N=C1NC(=O)NCCC(=O)NC4=NOC(=C4)C)C', 'S(=O)(=O)(NC=1C(=C(C=CC1)C)C)C2=C(C=CC(=C2)C(=O)NC3=C(C=4C=CC=CC4)C=CC=C3)C', 'OC1(C=2C(N(C1=O)C)=CC=CC2)CC(=O)C3=CC(N4C=CC=C4)=CC=C3', 'S=C(NC1=CC=C(C(=O)N2CCOCC2)C=C1)NC(=O)C3=CC=C(N(=O)=O)C=C3', 'FC=1C(CC2=C(O)N3N=CC(=C3N=C2C)C(=O)NCC=4C=C5OCOC5=CC4)=CC=CC1', 'O=C(NC(CC1=CC=CC=C1)(C)C)C=C', 'FC1=CC=C(NC(=O)CN2CCN(CC2)CC(=O)NC=3C(OC)=CC=CC3)C=C1', 'ClC1=CC(C2NC3(N=C(C2)C4=CC=5OCOC5C=C4)CCN(CC3)C(C)C)=C(O)C=C1', 'O(C1=CC=C(N2NC=3C(N2)=NNC3N)C=C1)CC', 'O1C=2C(C=3C1=CC=CC3)=CC(OC)=C(NC(=O)C4=C5C(=NC(=C4)C=6C=CC=NC6)C=CC(=C5)C)C2']
+Initial known_Y shape: (10, 1)
+Initial known_Y values: [[0.96023066]
+ [0.95704456]
+ [1.10881141]
+ [0.88334065]
+ [0.9840362 ]
+ [0.85209518]
+ [1.0232173 ]
+ [1.03213228]
+ [0.98086382]
+ [0.87982933]]
+2024-09-03 14:38:56,510 - bo_loop_logger - INFO - Starting BO loop...
+2024-09-03 14:38:56,510 - bo_loop_logger - INFO - Canonicalizing all smiles
+2024-09-03 14:39:06,921 - bo_loop_logger - INFO - Start BO iteration 0. Dataset size=10
+2024-09-03 14:39:08,923 - bo_loop_logger - INFO - UCB beta: 0.132
+2024-09-03 14:41:16,284 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(CN2C(=O)CCC2(C)C(=O)NCc2cccnc2)cc1']
+2024-09-03 14:41:16,298 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4552184348697508]
+2024-09-03 14:41:16,324 - bo_loop_logger - DEBUG - Eval batch mu: [0.34890235504854267]
+2024-09-03 14:41:16,325 - bo_loop_logger - DEBUG - Eval batch std: [0.8052790793983611]
+2024-09-03 14:41:16,410 - bo_loop_logger - DEBUG - Eval batch scores: [0.46274711]
+2024-09-03 14:41:16,413 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(CN2C(=O)CCC2(C)C(=O)NCc2cccnc2)cc1 with acquisition function value = 0.4552184348697508
+2024-09-03 14:41:16,416 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4627471126840499
+2024-09-03 14:41:16,416 - bo_loop_logger - INFO - Updated dataset size: 11
+2024-09-03 14:41:16,423 - bo_loop_logger - INFO - Start BO iteration 1. Dataset size=11
+2024-09-03 14:41:16,457 - bo_loop_logger - INFO - UCB beta: 0.056
+2024-09-03 14:43:19,889 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(SC(C)C(=O)NCc2cccnc2)cc1']
+2024-09-03 14:43:19,889 - bo_loop_logger - DEBUG - Eval batch acq values: [0.38490033059142675]
+2024-09-03 14:43:19,889 - bo_loop_logger - DEBUG - Eval batch mu: [0.33719618439263965]
+2024-09-03 14:43:19,889 - bo_loop_logger - DEBUG - Eval batch std: [0.8508842009752522]
+2024-09-03 14:43:19,898 - bo_loop_logger - DEBUG - Eval batch scores: [0.44506276]
+2024-09-03 14:43:19,898 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(SC(C)C(=O)NCc2cccnc2)cc1 with acquisition function value = 0.38490033059142675
+2024-09-03 14:43:19,898 - bo_loop_logger - INFO - Value of chosen SMILES: 0.44506275510927495
+2024-09-03 14:43:19,898 - bo_loop_logger - INFO - Updated dataset size: 12
+2024-09-03 14:43:19,900 - bo_loop_logger - INFO - Start BO iteration 2. Dataset size=12
+2024-09-03 14:43:19,918 - bo_loop_logger - INFO - UCB beta: 0.034
+2024-09-03 14:45:56,856 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(-n2nc(-c3ccco3)cc2C(=O)NCc2cccnc2)cc1']
+2024-09-03 14:45:56,859 - bo_loop_logger - DEBUG - Eval batch acq values: [0.3780272848055789]
+2024-09-03 14:45:56,860 - bo_loop_logger - DEBUG - Eval batch mu: [0.3483909403171458]
+2024-09-03 14:45:56,860 - bo_loop_logger - DEBUG - Eval batch std: [0.8622825572666576]
+2024-09-03 14:45:56,912 - bo_loop_logger - DEBUG - Eval batch scores: [0.43930336]
+2024-09-03 14:45:56,913 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(-n2nc(-c3ccco3)cc2C(=O)NCc2cccnc2)cc1 with acquisition function value = 0.3780272848055789
+2024-09-03 14:45:56,914 - bo_loop_logger - INFO - Value of chosen SMILES: 0.439303358194609
+2024-09-03 14:45:56,915 - bo_loop_logger - INFO - Updated dataset size: 13
+2024-09-03 14:45:56,918 - bo_loop_logger - INFO - Start BO iteration 3. Dataset size=13
+2024-09-03 14:45:56,952 - bo_loop_logger - INFO - UCB beta: 0.093
+2024-09-03 14:48:06,903 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(S(=O)(=O)N2CCC(C(=O)NCc3cccnc3)CC2)cc1']
+2024-09-03 14:48:06,903 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4321953647130339]
+2024-09-03 14:48:06,903 - bo_loop_logger - DEBUG - Eval batch mu: [0.3555103962065096]
+2024-09-03 14:48:06,904 - bo_loop_logger - DEBUG - Eval batch std: [0.8281030992257158]
+2024-09-03 14:48:06,919 - bo_loop_logger - DEBUG - Eval batch scores: [0.49650494]
+2024-09-03 14:48:06,921 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(S(=O)(=O)N2CCC(C(=O)NCc3cccnc3)CC2)cc1 with acquisition function value = 0.4321953647130339
+2024-09-03 14:48:06,923 - bo_loop_logger - INFO - Value of chosen SMILES: 0.49650494491004044
+2024-09-03 14:48:06,924 - bo_loop_logger - INFO - Updated dataset size: 14
+2024-09-03 14:48:06,930 - bo_loop_logger - INFO - Start BO iteration 4. Dataset size=14
+2024-09-03 14:48:06,953 - bo_loop_logger - INFO - UCB beta: 0.443
+2024-09-03 14:50:18,963 - bo_loop_logger - DEBUG - Eval batch SMILES: ['CCOc1ccc(N2C(=N)C(C(=O)NCc3cccnc3)SC2=S)cc1']
+2024-09-03 14:50:18,967 - bo_loop_logger - DEBUG - Eval batch acq values: [0.7354261002572925]
+2024-09-03 14:50:18,968 - bo_loop_logger - DEBUG - Eval batch mu: [0.35155123080494416]
+2024-09-03 14:50:18,968 - bo_loop_logger - DEBUG - Eval batch std: [0.8672762140014224]
+2024-09-03 14:50:18,997 - bo_loop_logger - DEBUG - Eval batch scores: [0.39354343]
+2024-09-03 14:50:18,997 - bo_loop_logger - INFO - Chosen SMILES: CCOc1ccc(N2C(=N)C(C(=O)NCc3cccnc3)SC2=S)cc1 with acquisition function value = 0.7354261002572925
+2024-09-03 14:50:18,998 - bo_loop_logger - INFO - Value of chosen SMILES: 0.39354343481244725
+2024-09-03 14:50:18,998 - bo_loop_logger - INFO - Updated dataset size: 15
+2024-09-03 14:50:19,000 - bo_loop_logger - INFO - Start BO iteration 5. Dataset size=15
+2024-09-03 14:50:19,039 - bo_loop_logger - INFO - UCB beta: 0.248
+2024-09-03 14:52:40,440 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccccc1C=S(O)(O)=Cc1ccc(C(=O)NCc2cccnc2)o1']
+2024-09-03 14:52:40,440 - bo_loop_logger - DEBUG - Eval batch acq values: [0.5622696693704139]
+2024-09-03 14:52:40,440 - bo_loop_logger - DEBUG - Eval batch mu: [0.3471610052819318]
+2024-09-03 14:52:40,440 - bo_loop_logger - DEBUG - Eval batch std: [0.86780606848676]
+2024-09-03 14:52:40,448 - bo_loop_logger - DEBUG - Eval batch scores: [0.33607856]
+2024-09-03 14:52:40,448 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccccc1C=S(O)(O)=Cc1ccc(C(=O)NCc2cccnc2)o1 with acquisition function value = 0.5622696693704139
+2024-09-03 14:52:40,448 - bo_loop_logger - INFO - Value of chosen SMILES: 0.3360785590789169
+2024-09-03 14:52:40,448 - bo_loop_logger - INFO - Updated dataset size: 16
+2024-09-03 14:52:40,459 - bo_loop_logger - INFO - Start BO iteration 6. Dataset size=16
+2024-09-03 14:52:40,490 - bo_loop_logger - INFO - UCB beta: 0.328
+2024-09-03 14:54:43,198 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(CNC(=O)C2CCCN2C(=O)NCc2ccccc2)cc1']
+2024-09-03 14:54:43,198 - bo_loop_logger - DEBUG - Eval batch acq values: [0.6292132558242036]
+2024-09-03 14:54:43,199 - bo_loop_logger - DEBUG - Eval batch mu: [0.34758563496743866]
+2024-09-03 14:54:43,199 - bo_loop_logger - DEBUG - Eval batch std: [0.8585145353560094]
+2024-09-03 14:54:43,207 - bo_loop_logger - DEBUG - Eval batch scores: [0.44425956]
+2024-09-03 14:54:43,207 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(CNC(=O)C2CCCN2C(=O)NCc2ccccc2)cc1 with acquisition function value = 0.6292132558242036
+2024-09-03 14:54:43,207 - bo_loop_logger - INFO - Value of chosen SMILES: 0.44425956432312985
+2024-09-03 14:54:43,207 - bo_loop_logger - INFO - Updated dataset size: 17
+2024-09-03 14:54:43,208 - bo_loop_logger - INFO - Start BO iteration 7. Dataset size=17
+2024-09-03 14:54:43,229 - bo_loop_logger - INFO - UCB beta: 0.037
+2024-09-03 14:56:55,584 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(OCC(=O)N2CCN(C(=O)Cc3ccccc3)CC2)cc1']
+2024-09-03 14:56:55,584 - bo_loop_logger - DEBUG - Eval batch acq values: [0.39485032167956197]
+2024-09-03 14:56:55,584 - bo_loop_logger - DEBUG - Eval batch mu: [0.3645298945704777]
+2024-09-03 14:56:55,584 - bo_loop_logger - DEBUG - Eval batch std: [0.8164132301008514]
+2024-09-03 14:56:55,593 - bo_loop_logger - DEBUG - Eval batch scores: [0.43384247]
+2024-09-03 14:56:55,593 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(OCC(=O)N2CCN(C(=O)Cc3ccccc3)CC2)cc1 with acquisition function value = 0.39485032167956197
+2024-09-03 14:56:55,593 - bo_loop_logger - INFO - Value of chosen SMILES: 0.43384246836296925
+2024-09-03 14:56:55,594 - bo_loop_logger - INFO - Updated dataset size: 18
+2024-09-03 14:56:55,595 - bo_loop_logger - INFO - Start BO iteration 8. Dataset size=18
+2024-09-03 14:56:55,632 - bo_loop_logger - INFO - UCB beta: 0.153
+2024-09-03 14:59:12,590 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(-c2nc(N)n(C(=O)Cc3ccccc3)n2)cc1']
+2024-09-03 14:59:12,592 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4948806210943378]
+2024-09-03 14:59:12,592 - bo_loop_logger - DEBUG - Eval batch mu: [0.3642067041200816]
+2024-09-03 14:59:12,592 - bo_loop_logger - DEBUG - Eval batch std: [0.853094817104588]
+2024-09-03 14:59:12,620 - bo_loop_logger - DEBUG - Eval batch scores: [0.52321695]
+2024-09-03 14:59:12,620 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(-c2nc(N)n(C(=O)Cc3ccccc3)n2)cc1 with acquisition function value = 0.4948806210943378
+2024-09-03 14:59:12,620 - bo_loop_logger - INFO - Value of chosen SMILES: 0.523216951649402
+2024-09-03 14:59:12,620 - bo_loop_logger - INFO - Updated dataset size: 19
+2024-09-03 14:59:12,623 - bo_loop_logger - INFO - Start BO iteration 9. Dataset size=19
+2024-09-03 14:59:12,648 - bo_loop_logger - INFO - UCB beta: 0.012
+2024-09-03 15:02:28,111 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Nc1nc(-c2cccnc2)nn1C(=O)Cc1ccccc1']
+2024-09-03 15:02:28,113 - bo_loop_logger - DEBUG - Eval batch acq values: [0.409758874241863]
+2024-09-03 15:02:28,113 - bo_loop_logger - DEBUG - Eval batch mu: [0.4005495244756388]
+2024-09-03 15:02:28,114 - bo_loop_logger - DEBUG - Eval batch std: [0.7502909151823628]
+2024-09-03 15:02:28,155 - bo_loop_logger - DEBUG - Eval batch scores: [0.39740463]
+2024-09-03 15:02:28,157 - bo_loop_logger - INFO - Chosen SMILES: Nc1nc(-c2cccnc2)nn1C(=O)Cc1ccccc1 with acquisition function value = 0.409758874241863
+2024-09-03 15:02:28,157 - bo_loop_logger - INFO - Value of chosen SMILES: 0.3974046281066284
+2024-09-03 15:02:28,157 - bo_loop_logger - INFO - Updated dataset size: 20
+2024-09-03 15:02:28,164 - bo_loop_logger - INFO - Start BO iteration 10. Dataset size=20
+2024-09-03 15:02:28,198 - bo_loop_logger - INFO - UCB beta: 0.330
+2024-09-03 15:04:58,454 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(NC(=O)NCCCc2ccccc2)cc1']
+2024-09-03 15:04:58,454 - bo_loop_logger - DEBUG - Eval batch acq values: [0.6578609472945786]
+2024-09-03 15:04:58,454 - bo_loop_logger - DEBUG - Eval batch mu: [0.376286981585723]
+2024-09-03 15:04:58,454 - bo_loop_logger - DEBUG - Eval batch std: [0.8532472540423021]
+2024-09-03 15:04:58,461 - bo_loop_logger - DEBUG - Eval batch scores: [0.43761013]
+2024-09-03 15:04:58,461 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(NC(=O)NCCCc2ccccc2)cc1 with acquisition function value = 0.6578609472945786
+2024-09-03 15:04:58,461 - bo_loop_logger - INFO - Value of chosen SMILES: 0.43761012594250887
+2024-09-03 15:04:58,461 - bo_loop_logger - INFO - Updated dataset size: 21
+2024-09-03 15:04:58,463 - bo_loop_logger - INFO - Start BO iteration 11. Dataset size=21
+2024-09-03 15:04:58,487 - bo_loop_logger - INFO - UCB beta: 0.011
+2024-09-03 15:07:43,675 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Nc1nc(-c2ccccc2)nn1C(=O)Cc1ccccc1']
+2024-09-03 15:07:43,675 - bo_loop_logger - DEBUG - Eval batch acq values: [0.39296960308388895]
+2024-09-03 15:07:43,675 - bo_loop_logger - DEBUG - Eval batch mu: [0.38593508429909656]
+2024-09-03 15:07:43,675 - bo_loop_logger - DEBUG - Eval batch std: [0.6381668519750506]
+2024-09-03 15:07:43,687 - bo_loop_logger - DEBUG - Eval batch scores: [0.41036186]
+2024-09-03 15:07:43,687 - bo_loop_logger - INFO - Chosen SMILES: Nc1nc(-c2ccccc2)nn1C(=O)Cc1ccccc1 with acquisition function value = 0.39296960308388895
+2024-09-03 15:07:43,687 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4103618590951291
+2024-09-03 15:07:43,687 - bo_loop_logger - INFO - Updated dataset size: 22
+2024-09-03 15:07:43,691 - bo_loop_logger - INFO - Start BO iteration 12. Dataset size=22
+2024-09-03 15:07:43,727 - bo_loop_logger - INFO - UCB beta: 0.123
+2024-09-03 15:10:03,973 - bo_loop_logger - DEBUG - Eval batch SMILES: ['CSc1nc(-c2ccccc2)nn1C(=O)c1ccc(C)cc1']
+2024-09-03 15:10:03,975 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4883469197084865]
+2024-09-03 15:10:03,975 - bo_loop_logger - DEBUG - Eval batch mu: [0.3851178099805971]
+2024-09-03 15:10:03,976 - bo_loop_logger - DEBUG - Eval batch std: [0.8408492256896442]
+2024-09-03 15:10:04,005 - bo_loop_logger - DEBUG - Eval batch scores: [0.45660513]
+2024-09-03 15:10:04,005 - bo_loop_logger - INFO - Chosen SMILES: CSc1nc(-c2ccccc2)nn1C(=O)c1ccc(C)cc1 with acquisition function value = 0.4883469197084865
+2024-09-03 15:10:04,005 - bo_loop_logger - INFO - Value of chosen SMILES: 0.45660513499914984
+2024-09-03 15:10:04,005 - bo_loop_logger - INFO - Updated dataset size: 23
+2024-09-03 15:10:04,008 - bo_loop_logger - INFO - Start BO iteration 13. Dataset size=23
+2024-09-03 15:10:04,053 - bo_loop_logger - INFO - UCB beta: 0.011
+2024-09-03 15:11:38,149 - bo_loop_logger - DEBUG - Eval batch SMILES: ['CCC(=O)n1nc(-c2ccccc2)nc1SCC(=O)Nc1ccc(C)cc1']
+2024-09-03 15:11:38,149 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4128679631189294]
+2024-09-03 15:11:38,149 - bo_loop_logger - DEBUG - Eval batch mu: [0.4041538412053014]
+2024-09-03 15:11:38,149 - bo_loop_logger - DEBUG - Eval batch std: [0.8014500583574858]
+2024-09-03 15:11:38,160 - bo_loop_logger - DEBUG - Eval batch scores: [0.42454643]
+2024-09-03 15:11:38,161 - bo_loop_logger - INFO - Chosen SMILES: CCC(=O)n1nc(-c2ccccc2)nc1SCC(=O)Nc1ccc(C)cc1 with acquisition function value = 0.4128679631189294
+2024-09-03 15:11:38,161 - bo_loop_logger - INFO - Value of chosen SMILES: 0.42454643118837493
+2024-09-03 15:11:38,161 - bo_loop_logger - INFO - Updated dataset size: 24
+2024-09-03 15:11:38,163 - bo_loop_logger - INFO - Start BO iteration 14. Dataset size=24
+2024-09-03 15:11:38,192 - bo_loop_logger - INFO - UCB beta: 0.076
+2024-09-03 15:13:13,514 - bo_loop_logger - DEBUG - Eval batch SMILES: ['CCC(=O)n1nc(-c2ccc(Cl)cc2)nc1NCc1ccccc1']
+2024-09-03 15:13:13,514 - bo_loop_logger - DEBUG - Eval batch acq values: [0.45520080439035826]
+2024-09-03 15:13:13,514 - bo_loop_logger - DEBUG - Eval batch mu: [0.3926314333195222]
+2024-09-03 15:13:13,514 - bo_loop_logger - DEBUG - Eval batch std: [0.8244116671911071]
+2024-09-03 15:13:13,522 - bo_loop_logger - DEBUG - Eval batch scores: [0.43401429]
+2024-09-03 15:13:13,522 - bo_loop_logger - INFO - Chosen SMILES: CCC(=O)n1nc(-c2ccc(Cl)cc2)nc1NCc1ccccc1 with acquisition function value = 0.45520080439035826
+2024-09-03 15:13:13,522 - bo_loop_logger - INFO - Value of chosen SMILES: 0.43401429283209264
+2024-09-03 15:13:13,523 - bo_loop_logger - INFO - Updated dataset size: 25
+2024-09-03 15:13:13,524 - bo_loop_logger - INFO - Start BO iteration 15. Dataset size=25
+2024-09-03 15:13:13,563 - bo_loop_logger - INFO - UCB beta: 0.768
+2024-09-03 15:14:50,358 - bo_loop_logger - DEBUG - Eval batch SMILES: ['COCC(=O)Oc1c(S(=O)(=O)c2ccc(C)cc2)c(C)nn1-c1ccccc1']
+2024-09-03 15:14:50,358 - bo_loop_logger - DEBUG - Eval batch acq values: [1.04421940558467]
+2024-09-03 15:14:50,358 - bo_loop_logger - DEBUG - Eval batch mu: [0.373670575604411]
+2024-09-03 15:14:50,359 - bo_loop_logger - DEBUG - Eval batch std: [0.8734156062989814]
+2024-09-03 15:14:50,373 - bo_loop_logger - DEBUG - Eval batch scores: [0.47385924]
+2024-09-03 15:14:50,375 - bo_loop_logger - INFO - Chosen SMILES: COCC(=O)Oc1c(S(=O)(=O)c2ccc(C)cc2)c(C)nn1-c1ccccc1 with acquisition function value = 1.04421940558467
+2024-09-03 15:14:50,377 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4738592387984482
+2024-09-03 15:14:50,378 - bo_loop_logger - INFO - Updated dataset size: 26
+2024-09-03 15:14:50,385 - bo_loop_logger - INFO - Start BO iteration 16. Dataset size=26
+2024-09-03 15:14:50,425 - bo_loop_logger - INFO - UCB beta: 0.684
+2024-09-03 15:16:35,497 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(C(=O)Nc2c(C#N)c(C)c(C)n2Cc2ccccc2)cc1']
+2024-09-03 15:16:35,497 - bo_loop_logger - DEBUG - Eval batch acq values: [0.9777457991645265]
+2024-09-03 15:16:35,497 - bo_loop_logger - DEBUG - Eval batch mu: [0.3976544723610347]
+2024-09-03 15:16:35,497 - bo_loop_logger - DEBUG - Eval batch std: [0.8483937943885677]
+2024-09-03 15:16:35,503 - bo_loop_logger - DEBUG - Eval batch scores: [0.43584441]
+2024-09-03 15:16:35,504 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(C(=O)Nc2c(C#N)c(C)c(C)n2Cc2ccccc2)cc1 with acquisition function value = 0.9777457991645265
+2024-09-03 15:16:35,504 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4358444075332111
+2024-09-03 15:16:35,504 - bo_loop_logger - INFO - Updated dataset size: 27
+2024-09-03 15:16:35,505 - bo_loop_logger - INFO - Start BO iteration 17. Dataset size=27
+2024-09-03 15:16:35,533 - bo_loop_logger - INFO - UCB beta: 0.244
+2024-09-03 15:18:13,899 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(C(=O)OCCc2c(C)nn(-c3ccccc3)c2O)cc1']
+2024-09-03 15:18:13,899 - bo_loop_logger - DEBUG - Eval batch acq values: [0.6167596749395541]
+2024-09-03 15:18:13,899 - bo_loop_logger - DEBUG - Eval batch mu: [0.4180342671670314]
+2024-09-03 15:18:13,899 - bo_loop_logger - DEBUG - Eval batch std: [0.8158113913716349]
+2024-09-03 15:18:13,906 - bo_loop_logger - DEBUG - Eval batch scores: [0.47716273]
+2024-09-03 15:18:13,907 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(C(=O)OCCc2c(C)nn(-c3ccccc3)c2O)cc1 with acquisition function value = 0.6167596749395541
+2024-09-03 15:18:13,907 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4771627252229109
+2024-09-03 15:18:13,907 - bo_loop_logger - INFO - Updated dataset size: 28
+2024-09-03 15:18:13,908 - bo_loop_logger - INFO - Start BO iteration 18. Dataset size=28
+2024-09-03 15:18:13,948 - bo_loop_logger - INFO - UCB beta: 0.267
+2024-09-03 15:19:53,185 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(C(=O)N2CCCC(c3ccccc3)=N2)cc1']
+2024-09-03 15:19:53,186 - bo_loop_logger - DEBUG - Eval batch acq values: [0.6230063231953875]
+2024-09-03 15:19:53,186 - bo_loop_logger - DEBUG - Eval batch mu: [0.4033279529526599]
+2024-09-03 15:19:53,186 - bo_loop_logger - DEBUG - Eval batch std: [0.8219077870367982]
+2024-09-03 15:19:53,192 - bo_loop_logger - DEBUG - Eval batch scores: [0.48201873]
+2024-09-03 15:19:53,192 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(C(=O)N2CCCC(c3ccccc3)=N2)cc1 with acquisition function value = 0.6230063231953875
+2024-09-03 15:19:53,192 - bo_loop_logger - INFO - Value of chosen SMILES: 0.4820187274181902
+2024-09-03 15:19:53,192 - bo_loop_logger - INFO - Updated dataset size: 29
+2024-09-03 15:19:53,194 - bo_loop_logger - INFO - Start BO iteration 19. Dataset size=29
+2024-09-03 15:19:53,220 - bo_loop_logger - INFO - UCB beta: 0.014
+2024-09-03 15:22:38,942 - bo_loop_logger - DEBUG - Eval batch SMILES: ['Cc1ccc(NC(=O)CSc2nc(C)c(Cc3ccccc3)c(O)n2)cc1']
+2024-09-03 15:22:38,946 - bo_loop_logger - DEBUG - Eval batch acq values: [0.4189901217537346]
+2024-09-03 15:22:38,946 - bo_loop_logger - DEBUG - Eval batch mu: [0.408071114891722]
+2024-09-03 15:22:38,946 - bo_loop_logger - DEBUG - Eval batch std: [0.7951710561068056]
+2024-09-03 15:22:39,014 - bo_loop_logger - DEBUG - Eval batch scores: [0.34826032]
+2024-09-03 15:22:39,015 - bo_loop_logger - INFO - Chosen SMILES: Cc1ccc(NC(=O)CSc2nc(C)c(Cc3ccccc3)c(O)n2)cc1 with acquisition function value = 0.4189901217537346
+2024-09-03 15:22:39,019 - bo_loop_logger - INFO - Value of chosen SMILES: 0.3482603175959428
+2024-09-03 15:22:39,019 - bo_loop_logger - INFO - Updated dataset size: 30
+2024-09-03 15:22:39,021 - bo_loop_logger - INFO - Finished BO loop.
